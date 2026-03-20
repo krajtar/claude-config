@@ -25,7 +25,8 @@ claude() {
     echo "  1) Local (default)"
     echo "  2) New SafeClaw container"
     echo "  3) New SafeClaw container + clone current repo"
-    read -rp "Choice [1]: " choice
+    printf "Choice [1]: "
+    read -r choice
     case "${choice:-1}" in
       1) command claude ;;
       2) sc ;;
@@ -50,7 +51,8 @@ dashboard() {
 sc() {
   local name="${1:-}"
   if [[ -z "$name" ]]; then
-    read -rp "Session name (enter for random): " name
+    printf "Session name (enter for random): "
+    read -r name
     [[ -z "$name" ]] && name="s$(date +%s | tail -c 5)"
   fi
   "$SAFECLAW_DIR/scripts/run.sh" -s "$name" -n
