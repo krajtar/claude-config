@@ -1,0 +1,49 @@
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1",
+    "ENABLE_TOOL_SEARCH": "true",
+    "DISABLE_AUTO_COMPACT": "true"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Read(~/.claude)",
+      "Read(//tmp/**)"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash __HOME__/projects/claude-code-tips/scripts/check-context.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash __HOME__/projects/claude-code-tips/scripts/context-bar.sh"
+  },
+  "enabledPlugins": {
+    "dx@ykdojo": true,
+    "playwright@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ykdojo": {
+      "source": {
+        "source": "github",
+        "repo": "ykdojo/claude-code-tips"
+      }
+    }
+  },
+  "voiceEnabled": true,
+  "skipDangerousModePermissionPrompt": true
+}
