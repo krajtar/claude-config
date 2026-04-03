@@ -21,11 +21,16 @@ claude() {
 
   # When called with no args, ask where to run
   if [[ ${#args[@]} -eq 0 ]]; then
+    local has_safeclaw=false
+    [[ -d "$SAFECLAW_DIR/scripts" ]] && has_safeclaw=true
+
     echo "Run Claude:"
     echo "  1) Local (default)"
     echo "  2) Local + Headroom proxy"
-    echo "  3) New SafeClaw container"
-    echo "  4) New SafeClaw container + clone current repo"
+    if $has_safeclaw; then
+      echo "  3) New SafeClaw container"
+      echo "  4) New SafeClaw container + clone current repo"
+    fi
     printf "Choice [1]: "
     read -r choice
     case "${choice:-1}" in
@@ -38,8 +43,8 @@ claude() {
         ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude
         kill "$proxy_pid" 2>/dev/null
         ;;
-      3) sc ;;
-      4) scg ;;
+      3) $has_safeclaw && sc || { echo "SafeClaw not installed."; return 1; } ;;
+      4) $has_safeclaw && scg || { echo "SafeClaw not installed."; return 1; } ;;
       *) echo "Invalid choice."; return 1 ;;
     esac
   else
