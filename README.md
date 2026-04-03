@@ -25,14 +25,13 @@ The installer will:
 2. Install CLAUDE.md, settings.json, statusline script, and custom skills
 3. Install shell aliases to `~/.claude-shell.sh` and source it from both `~/.bashrc` and `~/.zshrc`
 4. Clone [claude-code-tips](https://github.com/ykdojo/claude-code-tips) to `~/projects/claude-code-tips` (provides dx plugin, statusline scripts, hooks)
-5. Install plugins: `superpowers`, `playwright`, `dx`
+5. Install plugins: `playwright`, `dx`
 
 ## Plugins
 
 Installed automatically by `install.sh`. Manual install:
 
 ```
-claude plugin install superpowers@claude-plugins-official
 claude plugin install playwright@claude-plugins-official
 claude plugin install dx@ykdojo
 ```
@@ -44,7 +43,7 @@ claude plugin install dx@ykdojo
 | `c` | `claude` |
 | `ch` | `claude --chrome` |
 | `cs` | `claude --dangerously-skip-permissions` |
-| `claude` (no args) | Interactive menu: local / SafeClaw container / SafeClaw + repo clone |
+| `claude` (no args) | Interactive menu: local / Headroom proxy / SafeClaw container / SafeClaw + repo clone |
 | `sc [name]` | Start SafeClaw container |
 | `scg [name]` | Start SafeClaw container + clone current repo |
 | `dashboard` | Start SafeClaw dashboard on port 7690 |
