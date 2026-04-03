@@ -23,14 +23,23 @@ claude() {
   if [[ ${#args[@]} -eq 0 ]]; then
     echo "Run Claude:"
     echo "  1) Local (default)"
-    echo "  2) New SafeClaw container"
-    echo "  3) New SafeClaw container + clone current repo"
+    echo "  2) Local + Headroom proxy"
+    echo "  3) New SafeClaw container"
+    echo "  4) New SafeClaw container + clone current repo"
     printf "Choice [1]: "
     read -r choice
     case "${choice:-1}" in
       1) command claude ;;
-      2) sc ;;
-      3) scg ;;
+      2)
+        headroom proxy --port 8787 &>/dev/null &
+        local proxy_pid=$!
+        # Wait briefly for proxy to start
+        sleep 1
+        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude
+        kill "$proxy_pid" 2>/dev/null
+        ;;
+      3) sc ;;
+      4) scg ;;
       *) echo "Invalid choice."; return 1 ;;
     esac
   else

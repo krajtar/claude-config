@@ -87,12 +87,10 @@ fi
 echo
 if command -v claude &>/dev/null; then
   echo "Installing plugins..."
-  # claude plugin install superpowers@claude-plugins-official 2>/dev/null && echo "✓ Installed superpowers plugin" || echo "⊘ superpowers plugin already installed or failed"
   claude plugin install playwright@claude-plugins-official 2>/dev/null && echo "✓ Installed playwright plugin" || echo "⊘ playwright plugin already installed or failed"
   claude plugin install dx@ykdojo 2>/dev/null && echo "✓ Installed dx plugin" || echo "⊘ dx plugin already installed or failed"
 else
   echo "⊘ claude CLI not found — install plugins manually after installing Claude Code:"
-  echo "  claude plugin install superpowers@claude-plugins-official"
   echo "  claude plugin install playwright@claude-plugins-official"
   echo "  claude plugin install dx@ykdojo"
 fi
