@@ -198,7 +198,9 @@ if [[ "$NO_PROMPT" == true ]]; then
 fi
 
 echo
-read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
+if ! [[ -e "$HOME/.claude/.autoupdate-stamp" ]]; then
+  read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
+fi
 
 if [[ "${ENABLE_AUTOUPDATE,,}" == "y" || "${ENABLE_AUTOUPDATE,,}" == "yes" ]]; then
   AUTOUPDATE_BLOCK='
