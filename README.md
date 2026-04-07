@@ -1,12 +1,15 @@
 # Claude Code Configuration
 
-Personal Claude Code configuration, skills, aliases, and scripts — portable across machines. Works with both **bash** and **zsh**.
+Personal Claude Code configuration, skills, aliases, and scripts — portable across machines. Works with both **bash** and **zsh** on **macOS**, **Linux**, and **Windows (WSL)**.
 
 ## What's included
 
 | Path | Description |
 |------|-------------|
-| `claude/CLAUDE.md` | Global preferences (git, security, WSL, communication style) |
+| `claude/CLAUDE-base.md` | Shared preferences (git, security, problem solving, communication) |
+| `claude/CLAUDE-macos.md` | macOS-specific additions (pbcopy, open, Homebrew) |
+| `claude/CLAUDE-linux.md` | Linux-specific additions (xclip, xdg-open) |
+| `claude/CLAUDE-windows.md` | Windows/WSL-specific additions (path translation, CRLF handling) |
 | `claude/settings.json` | Settings (model, env vars, hooks, plugins, statusline) |
 | `claude/statusline-command.sh` | Context/model display bar for statusline |
 | `claude/skills/` | Custom skills (k8s-force-cleanup, k8s-list-ns-resources) |
@@ -21,11 +24,31 @@ cd ~/claude-config && ./install.sh
 ```
 
 The installer will:
-1. Back up any existing `~/.claude` config
-2. Install CLAUDE.md, settings.json, statusline script, and custom skills
-3. Install shell aliases to `~/.claude-shell.sh` and source it from both `~/.bashrc` and `~/.zshrc`
-4. Clone [claude-code-tips](https://github.com/ykdojo/claude-code-tips) to `~/projects/claude-code-tips` (provides dx plugin, statusline scripts, hooks)
-5. Install plugins: `playwright`, `dx`
+1. **Detect your OS** (macOS / Linux / Windows via WSL) and install `CLAUDE.md` by concatenating the shared base with the OS-specific fragment
+2. **Detect your shell** (bash or zsh) and only modify the appropriate rc file
+3. Back up any existing `~/.claude` config
+4. Install CLAUDE.md, settings.json, statusline script, and custom skills
+5. Install shell aliases to `~/.claude-shell.sh` and source it from your rc file
+6. **Ask if you want auto-updates** (see below)
+7. Clone [claude-code-tips](https://github.com/ykdojo/claude-code-tips) to `~/projects/claude-code-tips`
+8. Install plugins: `playwright`, `dx`
+
+## Auto-updates
+
+During installation you'll be prompted to enable auto-updates. If enabled, every new shell session (checked once per day) will:
+
+1. Fetch the latest commits from the remote
+2. If updates are available, show the list of new commits and ask whether to update
+3. On confirmation, pull the changes, print what was downloaded, and reinstall the config
+
+To disable auto-updates later, re-run `./install.sh` and answer **N** at the prompt — the updater block will be removed from your rc file.
+
+### CLAUDE.md drift protection
+
+The installer tracks a hash of the `CLAUDE.md` it installs. On subsequent updates:
+
+- If you **haven't edited** `~/.claude/CLAUDE.md` — it gets updated automatically
+- If you **have local edits** — the update is **skipped** with an error message to preserve your changes. You can diff against the new version and re-run the installer after resolving
 
 ## Plugins
 
@@ -51,5 +74,6 @@ claude plugin install dx@ykdojo
 ## Dependencies
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`npm install -g @anthropic-ai/claude-code`)
-- [claude-code-tips](https://github.com/ykdojo/claude-code-tips) (cloned automatically)
+- [claude-code-tips](https://github.com/ykdojo/claude-code-tips) (cloned automatically — provides dx plugin, statusline scripts, hooks)
+- [Headroom](https://github.com/chopratejas/headroom) (optional — context compression proxy, used by the `claude` interactive menu)
 - `jq`, `python3` (for statusline script)
