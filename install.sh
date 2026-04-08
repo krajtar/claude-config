@@ -294,7 +294,7 @@ TIPS_DIR="$PROJECTS_DIR/claude-code-tips"
 if [ -d "$TIPS_DIR/.git" ]; then
   echo "✓ claude-code-tips already cloned at $TIPS_DIR"
   echo "  Pulling latest..."
-  git -C "$TIPS_DIR" pull --ff-only 2>/dev/null || echo "  (pull skipped — may have local changes)"
+  git -C "$TIPS_DIR" pull --ff-only --quiet 2>/dev/null || echo "  (pull skipped — may have local changes)"
 else
   echo "Cloning claude-code-tips..."
   git clone https://github.com/ykdojo/claude-code-tips.git "$TIPS_DIR"
