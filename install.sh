@@ -202,7 +202,7 @@ if ! [[ -e "$HOME/.claude/.autoupdate-stamp" ]]; then
   read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
 fi
 
-if [[ "${ENABLE_AUTOUPDATE,,}" == "y" || "${ENABLE_AUTOUPDATE,,}" == "yes" ]]; then
+if [[ "$ENABLE_AUTOUPDATE" == [yY] || "$ENABLE_AUTOUPDATE" == [yY][eE][sS] ]]; then
   AUTOUPDATE_BLOCK='
 # Claude Config auto-update
 claude_config_autoupdate() {
@@ -247,7 +247,7 @@ claude_config_autoupdate() {
     echo ""
     printf "Do you want to update now? (y/N): "
     read -r answer </dev/tty
-    if [[ "${answer,,}" == "y" || "${answer,,}" == "yes" ]]; then
+    if [[ "$answer" == [yY] || "$answer" == [yY][eE][sS] ]]; then
       local old_head="$local_head"
       if git pull --ff-only --quiet 2>/dev/null; then
         echo ""
