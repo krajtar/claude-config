@@ -3,11 +3,6 @@
 
 SAFECLAW_DIR="$HOME/projects/safeclaw"
 
-# Claude Code aliases
-alias c='claude'
-alias ch='claude --chrome'
-alias cs='claude --dangerously-skip-permissions'
-
 # Claude wrapper: --fs shortcut + container prompt when no args
 claude() {
   local args=()
@@ -57,6 +52,11 @@ claude() {
     command claude "${args[@]}"
   fi
 }
+
+# Claude Code aliases (defined after the claude() function to avoid zsh parse errors)
+alias c='claude'
+alias ch='claude --chrome'
+alias cs='claude --dangerously-skip-permissions'
 
 # Start the dashboard on port 7690
 dashboard() {
