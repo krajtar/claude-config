@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash __HOME__/projects/claude-code-tips/scripts/check-context.sh"
+            "command": "bash __HOME__/.claude/scripts/check-context.sh"
           }
         ]
       }
@@ -29,7 +29,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash __HOME__/projects/claude-code-tips/scripts/context-bar.sh"
+    "command": "bash __HOME__/.claude/scripts/context-bar.sh"
   },
   "enabledPlugins": {
     "dx@ykdojo": true,

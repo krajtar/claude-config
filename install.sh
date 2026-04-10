@@ -4,7 +4,6 @@ set -euo pipefail
 # Works in both bash and zsh — but runs under bash via the shebang
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="$HOME/.claude"
-PROJECTS_DIR="$HOME/projects"
 
 NO_PROMPT=false
 if [[ "${1:-}" == "--no-prompt" ]]; then
@@ -85,7 +84,7 @@ mkdir -p "$CLAUDE_DIR/skills/tdd"
 mkdir -p "$CLAUDE_DIR/skills/plan"
 mkdir -p "$CLAUDE_DIR/skills/dev"
 mkdir -p "$CLAUDE_DIR/skills/oneshot"
-mkdir -p "$PROJECTS_DIR"
+mkdir -p "$CLAUDE_DIR/scripts"
 
 # --- Install CLAUDE.md (layered: managed + personal) ---
 #
@@ -234,6 +233,14 @@ cp "$SCRIPT_DIR/claude/skills/dev/SKILL.md" "$CLAUDE_DIR/skills/dev/SKILL.md"
 cp "$SCRIPT_DIR/claude/skills/oneshot/SKILL.md" "$CLAUDE_DIR/skills/oneshot/SKILL.md"
 echo "✓ Installed custom skills"
 
+# --- Install vendored scripts (statusline + context check hook) ---
+# These are vendored from https://github.com/ykdojo/claude-code-tips — see
+# claude/scripts/*.sh headers. Sync manually if upstream changes.
+cp "$SCRIPT_DIR/claude/scripts/check-context.sh" "$CLAUDE_DIR/scripts/check-context.sh"
+cp "$SCRIPT_DIR/claude/scripts/context-bar.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
+chmod +x "$CLAUDE_DIR/scripts/check-context.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
+echo "✓ Installed vendored scripts (check-context.sh, context-bar.sh)"
+
 # --- Install shell integration ---
 cp "$SCRIPT_DIR/shell/claude-shell.sh" "$HOME/.claude-shell.sh"
 echo "✓ Installed ~/.claude-shell.sh"
@@ -357,19 +364,6 @@ else
   else
     echo "✓ Auto-update not enabled"
   fi
-fi
-
-# --- Clone claude-code-tips (provides dx plugin, statusline, hooks) ---
-echo
-TIPS_DIR="$PROJECTS_DIR/claude-code-tips"
-if [ -d "$TIPS_DIR/.git" ]; then
-  echo "✓ claude-code-tips already cloned at $TIPS_DIR"
-  echo "  Pulling latest..."
-  git -C "$TIPS_DIR" pull --ff-only --quiet 2>/dev/null || echo "  (pull skipped — may have local changes)"
-else
-  echo "Cloning claude-code-tips..."
-  git clone https://github.com/ykdojo/claude-code-tips.git "$TIPS_DIR"
-  echo "✓ Cloned claude-code-tips to $TIPS_DIR"
 fi
 
 # --- Install Claude Code plugins ---

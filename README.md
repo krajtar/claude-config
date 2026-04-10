@@ -13,8 +13,9 @@ Personal Claude Code configuration, skills, aliases, and scripts — portable ac
 | `claude/settings.json` | Settings (model, env vars, hooks, plugins, statusline) |
 | `claude/statusline-command.sh` | Context/model display bar for statusline |
 | `claude/skills/` | Custom skills (k8s-force-cleanup, k8s-list-ns-resources) |
+| `claude/scripts/` | Vendored helper scripts (statusline, Stop hook) from [claude-code-tips](https://github.com/ykdojo/claude-code-tips) |
 | `shell/claude-shell.sh` | Shell aliases and functions (c, ch, cs, sc, scg, dashboard) |
-| `install.sh` | Installer — copies config, clones dependencies, installs plugins |
+| `install.sh` | Installer — copies config, installs plugins |
 
 ## Quick start
 
@@ -30,8 +31,7 @@ The installer will:
 4. Install CLAUDE.md, settings.json, statusline script, and custom skills
 5. Install shell aliases to `~/.claude-shell.sh` and source it from your rc file
 6. **Ask if you want auto-updates** (see below)
-7. Clone [claude-code-tips](https://github.com/ykdojo/claude-code-tips) to `~/projects/claude-code-tips`
-8. Install plugins: `playwright`, `dx`
+7. Install plugins: `playwright`, `dx`
 
 ## Auto-updates
 
@@ -74,6 +74,7 @@ claude plugin install dx@ykdojo
 ## Dependencies
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`npm install -g @anthropic-ai/claude-code`)
-- [claude-code-tips](https://github.com/ykdojo/claude-code-tips) (cloned automatically — provides dx plugin, statusline scripts, hooks)
 - [Headroom](https://github.com/chopratejas/headroom) (optional — context compression proxy, used by the `claude` interactive menu)
 - `jq`, `python3` (for statusline script)
+
+The statusline/hook scripts under `claude/scripts/` are vendored from [claude-code-tips](https://github.com/ykdojo/claude-code-tips). The `dx@ykdojo` plugin still resolves via Claude Code's marketplace system (no local clone needed).
