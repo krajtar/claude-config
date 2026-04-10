@@ -67,6 +67,7 @@ if [ -f "$CLAUDE_DIR/settings.json" ] || [ -f "$CLAUDE_DIR/CLAUDE.md" ]; then
   mkdir -p "$BACKUP"
   [ -f "$CLAUDE_DIR/settings.json" ] && cp "$CLAUDE_DIR/settings.json" "$BACKUP/"
   [ -f "$CLAUDE_DIR/CLAUDE.md" ] && cp "$CLAUDE_DIR/CLAUDE.md" "$BACKUP/"
+  [ -f "$CLAUDE_DIR/CLAUDE-managed.md" ] && cp "$CLAUDE_DIR/CLAUDE-managed.md" "$BACKUP/"
   [ -f "$CLAUDE_DIR/statusline-command.sh" ] && cp "$CLAUDE_DIR/statusline-command.sh" "$BACKUP/"
   echo
 fi
@@ -86,58 +87,127 @@ mkdir -p "$CLAUDE_DIR/skills/dev"
 mkdir -p "$CLAUDE_DIR/skills/oneshot"
 mkdir -p "$PROJECTS_DIR"
 
-# --- Install CLAUDE.md: base + OS-specific (with drift detection) ---
+# --- Install CLAUDE.md (layered: managed + personal) ---
+#
+# Layout:
+#   ~/.claude/CLAUDE-managed.md  — base + OS fragment, overwritten every install.
+#   ~/.claude/CLAUDE.md          — user's personal file. Installer only ever
+#                                  creates it (once) and ensures the @import
+#                                  line is present on the first line. All other
+#                                  edits belong to the user.
+#
+# The hash file tracks CLAUDE-managed.md so we can detect (for diagnostics) if
+# someone has hand-edited it; CLAUDE.md itself is never drift-checked because
+# it's owned by the user.
 CLAUDE_BASE="$SCRIPT_DIR/claude/CLAUDE-base.md"
 CLAUDE_OS="$SCRIPT_DIR/claude/CLAUDE-${DETECTED_OS}.md"
 
+MANAGED_DST="$CLAUDE_DIR/CLAUDE-managed.md"
+USER_DST="$CLAUDE_DIR/CLAUDE.md"
 HASH_FILE="$CLAUDE_DIR/.claude-md-hash"
-CLAUDE_MD_DST="$CLAUDE_DIR/CLAUDE.md"
+IMPORT_LINE='@~/.claude/CLAUDE-managed.md'
 
-install_claude_md() {
-  # Concatenate base + OS-specific fragment
-  cat "$CLAUDE_BASE" > "$CLAUDE_MD_DST"
-  if [ -f "$CLAUDE_OS" ]; then
-    cat "$CLAUDE_OS" >> "$CLAUDE_MD_DST"
-  fi
-  # Store hash of what we installed so we can detect user edits later
-  shasum -a 256 "$CLAUDE_MD_DST" | awk '{print $1}' > "$HASH_FILE"
+write_managed() {
+  cat "$CLAUDE_BASE" > "$MANAGED_DST"
+  [ -f "$CLAUDE_OS" ] && cat "$CLAUDE_OS" >> "$MANAGED_DST"
+  shasum -a 256 "$MANAGED_DST" | awk '{print $1}' > "$HASH_FILE"
 }
 
-if [ ! -f "$CLAUDE_MD_DST" ]; then
-  # Fresh install — no existing file
-  install_claude_md
-  echo "✓ Installed CLAUDE.md ($DETECTED_OS variant)"
-elif [ ! -f "$HASH_FILE" ]; then
-  # Existing file but no hash — migrating from before drift detection.
-  # Build what we would install into a temp file and compare
-  tmp_expected="$(mktemp)"
-  cat "$CLAUDE_BASE" > "$tmp_expected"
-  [ -f "$CLAUDE_OS" ] && cat "$CLAUDE_OS" >> "$tmp_expected"
-  src_hash="$(shasum -a 256 "$tmp_expected" | awk '{print $1}')"
-  rm -f "$tmp_expected"
-  dst_hash="$(shasum -a 256 "$CLAUDE_MD_DST" | awk '{print $1}')"
-  if [ "$src_hash" = "$dst_hash" ]; then
-    install_claude_md
-    echo "✓ Installed CLAUDE.md ($DETECTED_OS variant)"
+write_user_stub() {
+  cat > "$USER_DST" <<EOF
+$IMPORT_LINE
+
+<!-- The line above imports shared rules managed by claude-config.
+     Leave it in place — the installer will re-add it if removed.
+     Add your personal global rules below. -->
+EOF
+}
+
+# Idempotently ensure the @import line is present in CLAUDE.md.
+# Prepends it if missing — no warning, just fixes it.
+ensure_import_line() {
+  if ! grep -qxF "$IMPORT_LINE" "$USER_DST" 2>/dev/null; then
+    local tmp
+    tmp="$(mktemp)"
+    printf '%s\n\n' "$IMPORT_LINE" > "$tmp"
+    cat "$USER_DST" >> "$tmp"
+    mv "$tmp" "$USER_DST"
+    echo "✓ Re-added missing @import line to ~/.claude/CLAUDE.md"
+  fi
+}
+
+# Strip any line from CLAUDE.md that also appears verbatim in CLAUDE-managed.md.
+# Empty lines are excluded from the strip set (every doc has blanks). Runs of
+# 2+ blank lines left behind are collapsed into a single blank line so stripped
+# sections don't leave visible gaps.
+dedupe_user_from_managed() {
+  [ -f "$MANAGED_DST" ] || return 0
+  local tmp1 tmp2 stripped
+  tmp1="$(mktemp)"
+  tmp2="$(mktemp)"
+  awk -v managed="$MANAGED_DST" '
+    BEGIN {
+      while ((getline line < managed) > 0) {
+        if (line != "") managed_lines[line] = 1
+      }
+      close(managed)
+    }
+    {
+      if ($0 in managed_lines) { stripped++; next }
+      print
+    }
+    END { print stripped+0 > "/dev/stderr" }
+  ' "$USER_DST" > "$tmp1" 2> "$tmp2"
+  stripped="$(cat "$tmp2")"
+  if [ "${stripped:-0}" -gt 0 ]; then
+    # Collapse runs of blank lines left behind into a single blank line.
+    awk 'BEGIN{blank=0} /^$/{blank++; if(blank<=1) print; next} {blank=0; print}' \
+      "$tmp1" > "$USER_DST"
+    echo "✓ Removed $stripped duplicated managed line(s) from ~/.claude/CLAUDE.md"
+  fi
+  rm -f "$tmp1" "$tmp2"
+}
+
+if [ ! -f "$USER_DST" ]; then
+  # Fresh install — no CLAUDE.md at all.
+  write_managed
+  write_user_stub
+  echo "✓ Installed CLAUDE-managed.md ($DETECTED_OS variant)"
+  echo "✓ Created ~/.claude/CLAUDE.md (personal file with @import)"
+elif [ ! -f "$MANAGED_DST" ]; then
+  # Migration from the old single-file layout. The existing CLAUDE.md used to
+  # be the managed file; figure out whether it's clean (safe to replace with a
+  # fresh stub) or has user edits (preserve it, just prepend the import).
+  if [ -f "$HASH_FILE" ]; then
+    stored_hash="$(cat "$HASH_FILE")"
+    current_hash="$(shasum -a 256 "$USER_DST" | awk '{print $1}')"
+    if [ "$stored_hash" = "$current_hash" ]; then
+      # Clean old install: CLAUDE.md matches exactly what the old installer
+      # wrote. Replace it with a fresh personal stub.
+      write_managed
+      write_user_stub
+      echo "✓ Migrated to layered CLAUDE.md (managed + personal)"
+    else
+      # Old install with user edits. Preserve CLAUDE.md, write managed alongside,
+      # prepend @import, and strip any lines that duplicate the managed content.
+      write_managed
+      ensure_import_line
+      dedupe_user_from_managed
+      echo "✓ Migrated to layered CLAUDE.md ($DETECTED_OS variant)"
+    fi
   else
-    echo "⚠ ERROR: ~/.claude/CLAUDE.md has local modifications (no prior hash found)"
-    echo "  Skipping CLAUDE.md update to preserve your changes."
-    echo "  To accept the new version, delete ~/.claude/CLAUDE.md and re-run the installer."
+    # No hash file at all — very old install. Preserve, prepend import, dedupe.
+    write_managed
+    ensure_import_line
+    dedupe_user_from_managed
+    echo "✓ Migrated to layered CLAUDE.md ($DETECTED_OS variant)"
   fi
 else
-  # Hash file exists — compare to detect drift
-  stored_hash="$(cat "$HASH_FILE")"
-  current_hash="$(shasum -a 256 "$CLAUDE_MD_DST" | awk '{print $1}')"
-  if [ "$stored_hash" = "$current_hash" ]; then
-    # User hasn't modified it — safe to overwrite
-    install_claude_md
-    echo "✓ Installed CLAUDE.md ($DETECTED_OS variant)"
-  else
-    echo "⚠ ERROR: ~/.claude/CLAUDE.md has local modifications that conflict with the update"
-    echo "  Skipping CLAUDE.md update to preserve your changes."
-    echo "  To see what changed upstream: diff ~/.claude/CLAUDE.md $CLAUDE_MD_SRC"
-    echo "  To accept the new version, delete ~/.claude/CLAUDE.md and re-run the installer."
-  fi
+  # Normal update path: both files already exist in the new layout.
+  write_managed
+  ensure_import_line
+  dedupe_user_from_managed
+  echo "✓ Updated CLAUDE-managed.md ($DETECTED_OS variant)"
 fi
 
 # --- Install settings.json (replace __HOME__ placeholder) ---

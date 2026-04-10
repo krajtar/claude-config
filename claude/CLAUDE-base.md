@@ -1,5 +1,8 @@
 # Global Preferences
 
+## Editing Your Global CLAUDE.md
+- When asked to change your global CLAUDE.md, edit `~/.claude/CLAUDE.md` — never `~/.claude/CLAUDE-managed.md`, which is overwritten by the `claude-config` installer
+
 ## Git Commits
 - Never add "Co-Authored-By" lines to commit messages
 - **Never push directly to main.** Always use feature branches + MR/PR. If the user grants a one-time exception, that exception covers only that single push — confirm again for any subsequent push to main

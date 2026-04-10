@@ -53,10 +53,12 @@ claude() {
   fi
 }
 
-# Claude Code aliases (defined after the claude() function to avoid zsh parse errors)
-alias c='claude'
-alias ch='claude --chrome'
-alias cs='claude --dangerously-skip-permissions'
+# Claude Code aliases — only set if the name isn't already taken by the user.
+# Defining an alias that collides with a user function breaks re-sourcing their
+# rc file: zsh errors "defining function based on alias" on the next parse.
+type c  &>/dev/null || alias c='claude'
+type ch &>/dev/null || alias ch='claude --chrome'
+type cs &>/dev/null || alias cs='claude --dangerously-skip-permissions'
 
 # Start the dashboard on port 7690
 dashboard() {
