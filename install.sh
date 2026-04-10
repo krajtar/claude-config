@@ -305,8 +305,21 @@ fi
 echo
 if command -v claude &>/dev/null; then
   echo "Installing plugins..."
-  claude plugin install playwright@claude-plugins-official 2>/dev/null && echo "✓ Installed playwright plugin" || echo "⊘ playwright plugin already installed or failed"
-  claude plugin install dx@ykdojo 2>/dev/null && echo "✓ Installed dx plugin" || echo "⊘ dx plugin already installed or failed"
+  _install_plugin() {
+    local pkg="$1" label="$2"
+    local err
+    err=$(claude plugin install "$pkg" 2>&1 >/dev/null)
+    if [ $? -eq 0 ]; then
+      echo "✓ Installed $label"
+    elif echo "$err" | grep -qi "already"; then
+      echo "✓ $label already installed"
+    else
+      echo "⊘ Failed to install $label"
+      [ -n "$err" ] && echo "  $err"
+    fi
+  }
+  _install_plugin playwright@claude-plugins-official "playwright plugin"
+  _install_plugin dx@ykdojo "dx plugin"
 else
   echo "⊘ claude CLI not found — install plugins manually after installing Claude Code:"
   echo "  claude plugin install playwright@claude-plugins-official"
