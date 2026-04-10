@@ -242,8 +242,9 @@ chmod +x "$CLAUDE_DIR/scripts/check-context.sh" "$CLAUDE_DIR/scripts/context-bar
 echo "✓ Installed vendored scripts (check-context.sh, context-bar.sh)"
 
 # --- Install shell integration ---
-cp "$SCRIPT_DIR/shell/claude-shell.sh" "$HOME/.claude-shell.sh"
-echo "✓ Installed ~/.claude-shell.sh"
+# Symlink so edits in the repo take effect immediately (no re-install needed)
+ln -sfn "$SCRIPT_DIR/shell/claude-shell.sh" "$HOME/.claude-shell.sh"
+echo "✓ Linked ~/.claude-shell.sh → $SCRIPT_DIR/shell/claude-shell.sh"
 
 # --- Add source line to the user's shell rc file ---
 add_source_line() {
