@@ -23,9 +23,10 @@ claude() {
     echo "  1) Local (default)"
     echo "  2) Local + skip permissions"
     echo "  3) Local + Headroom proxy"
+    echo "  4) Local + Headroom + skip permissions"
     if $has_safeclaw; then
-      echo "  4) New SafeClaw container"
-      echo "  5) New SafeClaw container + clone current repo"
+      echo "  5) New SafeClaw container"
+      echo "  6) New SafeClaw container + clone current repo"
     fi
     printf "Choice [1]: "
     read -r choice
@@ -44,8 +45,20 @@ claude() {
         ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude
         [[ -n "$proxy_pid" ]] && kill "$proxy_pid" 2>/dev/null
         ;;
-      4) $has_safeclaw && sc || { echo "SafeClaw not installed."; return 1; } ;;
-      5) $has_safeclaw && scg || { echo "SafeClaw not installed."; return 1; } ;;
+      4)
+        local proxy_pid=""
+        if lsof -iTCP:8787 -sTCP:LISTEN &>/dev/null; then
+          echo "Headroom proxy already running on :8787"
+        else
+          headroom proxy --port 8787 &>/dev/null &
+          proxy_pid=$!
+          sleep 1
+        fi
+        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude --dangerously-skip-permissions
+        [[ -n "$proxy_pid" ]] && kill "$proxy_pid" 2>/dev/null
+        ;;
+      5) $has_safeclaw && sc || { echo "SafeClaw not installed."; return 1; } ;;
+      6) $has_safeclaw && scg || { echo "SafeClaw not installed."; return 1; } ;;
       *) echo "Invalid choice."; return 1 ;;
     esac
   else
