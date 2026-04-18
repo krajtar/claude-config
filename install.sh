@@ -277,7 +277,7 @@ fi
 
 echo
 ENABLE_AUTOUPDATE=""
-if ! [[ -e "$HOME/.claude/.autoupdate-stamp" ]]; then
+if ! grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null; then
   read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
 fi
 
