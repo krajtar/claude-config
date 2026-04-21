@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Feature planning — explore context, clarify requirements, produce a step-by-step implementation plan. No code until the plan is approved.
+description: Feature planning — explore context, clarify requirements, produce a step-by-step implementation plan. No code until the plan is approved. Use when the user asks "how should we approach X", "what's the best way to build Y", "help me design Z", or says they want to think through a feature before coding — not just when they say "plan".
 allowed-tools: Read, Grep, Glob, Agent
 argument-hint: <feature description or requirements>
 ---

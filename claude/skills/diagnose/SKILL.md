@@ -1,17 +1,30 @@
 ---
-name: debug
-description: Systematic debugging — root cause analysis before fixing. Investigate, hypothesize, test, then fix with user approval.
+name: diagnose
+description: Systematic debugging — root cause analysis before fixing. Investigate, hypothesize, test, then fix with user approval. Use this whenever the user asks "why is this not working", "why am I seeing this error", reports a bug, pastes a stack trace/error message/failing log, or describes unexpected behavior they want explained — not just when they say the word "debug".
 allowed-tools: Bash, Read, Grep, Glob, Agent
 argument-hint: <bug description, error message, or failing test>
 ---
 
 Systematic debugging using the scientific method. Diagnose before fixing.
 
+## Phase 0: Gather Context From the User
+
+Before touching any code, ask for whatever is missing. Skip any item the user has already provided — don't re-ask.
+
+1. **The error itself**: Do they have the error message, stack trace, log output, or screenshot?
+2. **When it started**: Is it a new issue, or has it always been broken? Any known correlation with a recent change, deploy, or upgrade?
+3. **Reproduction steps**: Can they give you steps to reproduce it? **Is it easy to reproduce, or intermittent/hard?** (This determines Phase 1 behavior.)
+4. **Environment**: Where is it happening — local, staging, prod? A specific user/account/input?
+
+Ask only for what's missing, in one batched question. Don't interrogate.
+
+**Shot-in-the-dark check**: If, based on the description alone, you can already think of a plausible quick fix (a common cause for this kind of symptom, a likely config issue, an obvious off-by-one, etc.), describe it briefly and ask the user whether they want to try it first before investing in deeper investigation, or skip straight to Phase 1. Be honest that it's a guess, not a diagnosis.
+
 ## Phase 1: Investigate
 
 Gather evidence before forming any hypothesis.
 
-1. **Reproduce the bug**: Run the failing command/test and capture the full error output
+1. **Reproduce the bug** *(only if reproduction is reasonably easy — per Phase 0)*: Run the failing command/test and capture the full error output. If the bug is intermittent, environment-specific, or otherwise hard to reproduce, **skip this step** and work from the evidence the user provided. Do not burn time trying to force a repro.
 2. **Read the relevant code**: Follow the stack trace or error path — read the actual source, don't guess
 3. **Check recent changes**: `git log --oneline -20` and `git diff HEAD~5` — did something change recently that correlates?
 4. **Map the data flow**: Trace the input through the system to where it breaks

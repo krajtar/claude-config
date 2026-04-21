@@ -1,6 +1,6 @@
 ---
 name: review
-description: Code review — dispatches review agents on current diff, categorizes issues as Critical/Important/Minor. Read-only unless user asks for fixes.
+description: Code review — dispatches review agents on current diff, categorizes issues as Critical/Important/Minor. Read-only unless user asks for fixes. Use when the user asks to look over, check, critique, or give feedback on a diff/PR/MR/branch/changes, asks "any issues with this?", or asks "what do you think?" about code they've written or staged — not just explicit "review" requests.
 allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: [scope:local|pushed|commit] [feature:description] [commit:hash]
 ---

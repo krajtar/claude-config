@@ -1,6 +1,6 @@
 ---
 name: explore
-description: Deep read-only codebase exploration — dispatches parallel agents to investigate a question, returns structured answers with file:line references. Never modifies files.
+description: Deep read-only codebase exploration — dispatches parallel agents to investigate a question, returns structured answers with file:line references. Never modifies files. Use when the user asks how a system works, where something is defined, what calls X, how data flows, or any "walk me through the code" question — not just explicit "explore" requests.
 model: haiku
 allowed-tools: Read, Grep, Glob, Agent
 argument-hint: <question about the codebase>
