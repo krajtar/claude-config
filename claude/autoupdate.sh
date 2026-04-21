@@ -1,7 +1,13 @@
+#!/usr/bin/env bash
+# Sourced from the user's shell rc file by the claude-config installer.
+# Self-locates config_dir via ${BASH_SOURCE[0]:-$0} (works in bash and zsh
+# with default FUNCTION_ARGZERO).
 
-# Claude Config auto-update
 claude_config_autoupdate() {
-  local config_dir="__CONFIG_DIR__"
+  local self config_dir
+  self="${BASH_SOURCE[0]:-$0}"
+  config_dir="$(cd "$(dirname "$self")/.." && pwd)"
+
   # Only check once per day (use a stamp file)
   local stamp_file="$HOME/.claude/.autoupdate-stamp"
   local now

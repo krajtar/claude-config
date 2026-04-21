@@ -271,30 +271,45 @@ if [[ "$NO_PROMPT" == true ]]; then
 fi
 
 echo
+# Autoupdate state detection:
+#   "new" = sourced from claude/autoupdate.sh (current layout)
+#   "old" = inline function body appended to rc by pre-refactor installer
+AUTOUPDATE_MARKER='claude/autoupdate.sh'
+
+has_new_autoupdate() { grep -qF "$AUTOUPDATE_MARKER" "$RC_FILE" 2>/dev/null; }
+has_old_autoupdate() {
+  grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null && ! has_new_autoupdate
+}
+
+append_autoupdate_source() {
+  {
+    echo ''
+    echo '# Claude Config auto-update'
+    echo "[ -f \"$SCRIPT_DIR/claude/autoupdate.sh\" ] && . \"$SCRIPT_DIR/claude/autoupdate.sh\""
+  } >> "$RC_FILE"
+}
+
+remove_old_inline_autoupdate() {
+  sed -i.bak '/# Claude Config auto-update/,/^claude_config_autoupdate$/d' "$RC_FILE"
+  rm -f "${RC_FILE}.bak"
+}
+
 ENABLE_AUTOUPDATE=""
-if ! grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null; then
+if ! has_new_autoupdate && ! has_old_autoupdate; then
   read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
 fi
 
-if [[ "$ENABLE_AUTOUPDATE" == [yY] || "$ENABLE_AUTOUPDATE" == [yY][eE][sS] ]]; then
-  # Add autoupdate block to rc file (source lives in claude/autoupdate.sh;
-  # __CONFIG_DIR__ placeholder gets replaced with the absolute config path).
-  if ! grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null; then
-    sed "s|__CONFIG_DIR__|$SCRIPT_DIR|g" "$SCRIPT_DIR/claude/autoupdate.sh" >> "$RC_FILE"
-    echo "✓ Added auto-update to $RC_FILE (checks daily on shell startup)"
-  else
-    echo "✓ Auto-update already configured in $RC_FILE"
-  fi
+if has_new_autoupdate; then
+  echo "✓ Auto-update already configured in $RC_FILE"
+elif has_old_autoupdate; then
+  remove_old_inline_autoupdate
+  append_autoupdate_source
+  echo "✓ Migrated auto-update to sourced script in $RC_FILE"
+elif [[ "$ENABLE_AUTOUPDATE" == [yY] || "$ENABLE_AUTOUPDATE" == [yY][eE][sS] ]]; then
+  append_autoupdate_source
+  echo "✓ Added auto-update to $RC_FILE (checks daily on shell startup)"
 else
-  # Remove autoupdate block if it exists (user opted out)
-  if grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null; then
-    # Remove the autoupdate block
-    sed -i.bak '/# Claude Config auto-update/,/^claude_config_autoupdate$/d' "$RC_FILE"
-    rm -f "${RC_FILE}.bak"
-    echo "✓ Removed auto-update from $RC_FILE"
-  else
-    echo "✓ Auto-update not enabled"
-  fi
+  echo "✓ Auto-update not enabled"
 fi
 
 # --- Install Claude Code plugins ---
