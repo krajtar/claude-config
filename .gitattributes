@@ -1,0 +1,7 @@
+# Shell scripts must always use LF endings — CRLF breaks `#!/usr/bin/env bash`
+# and causes `/usr/bin/env: 'bash\r': No such file or directory` errors.
+*.sh text eol=lf
+
+# Markdown and config files: normalize to LF to keep the repo platform-agnostic
+*.md text eol=lf
+*.json text eol=lf
