@@ -28,3 +28,6 @@
 
 ## Communication Style
 - When the user gives short imperatives like "just go for it" or "just do 1 and 2", execute immediately — do not ask clarifying questions
+
+## Skills
+- Before responding to any non-trivial request, scan the skills list in the system reminder and invoke a matching skill via the Skill tool instead of going straight to raw tools. Symptom/error reports → `diagnose`; "review/check this" → `review`; "how should we approach X" → `plan`; "how does X work / where is Y" → `explore`; small self-contained tasks → `oneshot`; test-first work → `tdd`. When in doubt, prefer the skill — skills encode workflow the user expects
