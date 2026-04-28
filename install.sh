@@ -263,6 +263,44 @@ add_source_line() {
 
 add_source_line "$RC_FILE"
 
+# --- Ensure bash login shells source ~/.bashrc ---
+# Bash login shells (notably macOS Terminal, and any `bash -l` invocation) read
+# ~/.bash_profile / ~/.bash_login / ~/.profile — but NOT ~/.bashrc. If none of
+# those files sources ~/.bashrc, the source line we just added above never runs
+# in a login shell, and `claude` / `c` / `ch` / `cs` silently fail to load.
+ensure_bashrc_bridge() {
+  local bridge_marker='# claude-config: source ~/.bashrc for login shells'
+  local bridge_line='[ -f ~/.bashrc ] && . ~/.bashrc'
+
+  # If any login rc file already sources ~/.bashrc, we're done.
+  local f
+  for f in "$HOME/.bash_profile" "$HOME/.bash_login" "$HOME/.profile"; do
+    if [ -f "$f" ] && grep -qE '(^|[^#])[[:space:]]*(\.|source)[[:space:]]+("?(~|\$HOME)/\.bashrc"?|"?\$HOME/\.bashrc"?)' "$f" 2>/dev/null; then
+      echo "✓ ~/.bashrc already sourced from $(basename "$f")"
+      return 0
+    fi
+  done
+
+  # Pick the first existing file in bash's login-rc precedence; create
+  # ~/.bash_profile if none exist.
+  local target=""
+  for f in "$HOME/.bash_profile" "$HOME/.bash_login" "$HOME/.profile"; do
+    if [ -f "$f" ]; then target="$f"; break; fi
+  done
+  target="${target:-$HOME/.bash_profile}"
+
+  {
+    [ -f "$target" ] && echo ''
+    echo "$bridge_marker"
+    echo "$bridge_line"
+  } >> "$target"
+  echo "✓ Added ~/.bashrc bridge to $(basename "$target") (login shells now load ~/.bashrc)"
+}
+
+if [[ "$USER_SHELL" == "bash" ]]; then
+  ensure_bashrc_bridge
+fi
+
 # --- Autoupdate prompt (skip in non-interactive mode) ---
 if [[ "$NO_PROMPT" == true ]]; then
   echo

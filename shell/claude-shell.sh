@@ -69,9 +69,27 @@ claude() {
 # Claude Code aliases — only set if the name isn't already taken by the user.
 # Defining an alias that collides with a user function breaks re-sourcing their
 # rc file: zsh errors "defining function based on alias" on the next parse.
-type c  &>/dev/null || alias c='claude'
-type ch &>/dev/null || alias ch='claude --chrome'
-type cs &>/dev/null || alias cs='claude --dangerously-skip-permissions'
+_claude_shell_alias() {  # name, target
+  local name="$1" target="$2" current
+  # If it's already an alias pointing at our target (re-sourcing case), no-op.
+  if [[ "$(type -t "$name" 2>/dev/null)" == "alias" ]]; then
+    current="$(alias "$name" 2>/dev/null)"
+    # bash prints: alias c='claude'   zsh prints: c=claude
+    if [[ "$current" == "alias $name='$target'" || "$current" == "$name=$target" ]]; then
+      return
+    fi
+  fi
+  if type "$name" &>/dev/null; then
+    printf '⚠ claude-shell: %s already defined (%s) — skipping alias\n' \
+      "$name" "$(type "$name" 2>/dev/null | head -1)" >&2
+    return
+  fi
+  alias "$name=$target"
+}
+_claude_shell_alias c  'claude'
+_claude_shell_alias ch 'claude --chrome'
+_claude_shell_alias cs 'claude --dangerously-skip-permissions'
+unset -f _claude_shell_alias
 
 # Start the dashboard on port 7690
 dashboard() {
