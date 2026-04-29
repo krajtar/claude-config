@@ -1,12 +1,15 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Sourced from the user's shell rc file by the claude-config installer.
-# Self-locates config_dir via ${BASH_SOURCE[0]:-$0} (works in bash and zsh
-# with default FUNCTION_ARGZERO).
+# The installer writes CLAUDE_CONFIG_DIR (absolute path) into the rc line so
+# this script works under any POSIX shell (bash, zsh, dash, ...) without
+# needing to self-locate.
 
 claude_config_autoupdate() {
-  local self config_dir
-  self="${BASH_SOURCE[0]:-$0}"
-  config_dir="$(cd "$(dirname "$self")/.." && pwd)"
+  local config_dir
+  config_dir="${CLAUDE_CONFIG_DIR:-}"
+  if [ -z "$config_dir" ] || [ ! -d "$config_dir" ]; then
+    return 0
+  fi
 
   # Only check once per day (use a stamp file)
   local stamp_file="$HOME/.claude/.autoupdate-stamp"
@@ -48,7 +51,11 @@ claude_config_autoupdate() {
     echo ""
     printf "Do you want to update now? (y/N): "
     read -r answer </dev/tty
-    if [[ "$answer" == [yY] || "$answer" == [yY][eE][sS] ]]; then
+    case "$answer" in
+      [yY]|[yY][eE][sS]) answer_yes=1 ;;
+      *) answer_yes=0 ;;
+    esac
+    if [ "$answer_yes" = 1 ]; then
       local old_head="$local_head"
       if git pull --ff-only --quiet 2>/dev/null; then
         echo ""

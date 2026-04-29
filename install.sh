@@ -310,20 +310,31 @@ fi
 
 echo
 # Autoupdate state detection:
-#   "new" = sourced from claude/autoupdate.sh (current layout)
-#   "old" = inline function body appended to rc by pre-refactor installer
+#   "current" = rc line exports CLAUDE_CONFIG_DIR before sourcing autoupdate.sh
+#   "stale"   = rc line sources autoupdate.sh without CLAUDE_CONFIG_DIR (broke
+#               under zsh because the script tried to self-locate via $0)
+#   "old"     = inline function body appended to rc by pre-refactor installer
 AUTOUPDATE_MARKER='claude/autoupdate.sh'
+AUTOUPDATE_ENV_MARKER='CLAUDE_CONFIG_DIR='
 
-has_new_autoupdate() { grep -qF "$AUTOUPDATE_MARKER" "$RC_FILE" 2>/dev/null; }
+has_current_autoupdate() {
+  grep -qF "$AUTOUPDATE_MARKER" "$RC_FILE" 2>/dev/null && \
+    grep -qF "$AUTOUPDATE_ENV_MARKER" "$RC_FILE" 2>/dev/null
+}
+has_stale_autoupdate() {
+  grep -qF "$AUTOUPDATE_MARKER" "$RC_FILE" 2>/dev/null && \
+    ! grep -qF "$AUTOUPDATE_ENV_MARKER" "$RC_FILE" 2>/dev/null
+}
 has_old_autoupdate() {
-  grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null && ! has_new_autoupdate
+  grep -qF 'claude_config_autoupdate' "$RC_FILE" 2>/dev/null && \
+    ! grep -qF "$AUTOUPDATE_MARKER" "$RC_FILE" 2>/dev/null
 }
 
 append_autoupdate_source() {
   {
     echo ''
     echo '# Claude Config auto-update'
-    echo "[ -f \"$SCRIPT_DIR/claude/autoupdate.sh\" ] && . \"$SCRIPT_DIR/claude/autoupdate.sh\""
+    echo "[ -f \"$SCRIPT_DIR/claude/autoupdate.sh\" ] && CLAUDE_CONFIG_DIR=\"$SCRIPT_DIR\" . \"$SCRIPT_DIR/claude/autoupdate.sh\""
   } >> "$RC_FILE"
 }
 
@@ -332,13 +343,23 @@ remove_old_inline_autoupdate() {
   rm -f "${RC_FILE}.bak"
 }
 
+remove_stale_autoupdate_source() {
+  # Removes the comment + the sourcing line (portable BSD/GNU regex range).
+  sed -i.bak '/# Claude Config auto-update/,/autoupdate\.sh/d' "$RC_FILE"
+  rm -f "${RC_FILE}.bak"
+}
+
 ENABLE_AUTOUPDATE=""
-if ! has_new_autoupdate && ! has_old_autoupdate; then
+if ! has_current_autoupdate && ! has_stale_autoupdate && ! has_old_autoupdate; then
   read -rp "Enable auto-updates for claude-config on shell startup? (y/N): " ENABLE_AUTOUPDATE
 fi
 
-if has_new_autoupdate; then
+if has_current_autoupdate; then
   echo "✓ Auto-update already configured in $RC_FILE"
+elif has_stale_autoupdate; then
+  remove_stale_autoupdate_source
+  append_autoupdate_source
+  echo "✓ Migrated auto-update line to pass CLAUDE_CONFIG_DIR (fixes zsh)"
 elif has_old_autoupdate; then
   remove_old_inline_autoupdate
   append_autoupdate_source
