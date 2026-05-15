@@ -1,8 +1,9 @@
 {
   "env": {
-    "DISABLE_AUTOUPDATER": "1",
+    "DISABLE_AUTOUPDATER": "0",
     "ENABLE_TOOL_SEARCH": "true",
-    "DISABLE_AUTO_COMPACT": "true"
+    "DISABLE_AUTO_COMPACT": "true",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "attribution": {
     "commit": "",
@@ -22,6 +23,10 @@
           {
             "type": "command",
             "command": "bash __HOME__/.claude/scripts/check-context.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash __HOME__/.claude/scripts/cache-timer-reset.sh"
           }
         ]
       }

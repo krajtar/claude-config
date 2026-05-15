@@ -176,10 +176,32 @@ else
     ctx="${bar} ${C_GRAY}~${pct}% of ${max_display} tokens"
 fi
 
-# Build output: Model | Dir | Branch (uncommitted) | Context
+# Cache freshness timer — shows expiry clock HH:MM
+cache_timer_segment=""
+ts_file="/tmp/claude-cache-timer.ts"
+if [[ -f "$ts_file" ]]; then
+    ts=$(cat "$ts_file" 2>/dev/null)
+    if [[ -n "$ts" && "$ts" =~ ^[0-9]+$ ]]; then
+        now=$(date +%s)
+        elapsed=$((now - ts))
+        [[ $elapsed -lt 0 ]] && elapsed=0
+        expiry_ts=$((ts + 300))
+        expiry_str=$(date -r "$expiry_ts" +%H:%M 2>/dev/null || date -d "@$expiry_ts" +%H:%M 2>/dev/null)
+        if [[ $elapsed -lt 240 ]]; then
+            C_TIMER='\033[38;5;71m'   # green
+        elif [[ $elapsed -lt 300 ]]; then
+            C_TIMER='\033[38;5;136m'  # gold
+        else
+            C_TIMER='\033[38;5;167m'  # red
+        fi
+        cache_timer_segment=" | ${C_TIMER}🕐 ${expiry_str}${C_RESET}"
+    fi
+fi
+
+# Build output: Model | Dir | Branch (uncommitted) | Context | Timer
 output="${C_ACCENT}${model}${C_GRAY} | 📁${dir}"
 [[ -n "$branch" ]] && output+=" | 🔀${branch} ${git_status}"
-output+=" | ${ctx}${C_RESET}"
+output+=" | ${ctx}${cache_timer_segment}${C_RESET}"
 
 printf '%b\n' "$output"
 

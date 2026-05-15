@@ -233,8 +233,11 @@ echo "✓ Installed custom skills"
 # claude/scripts/*.sh headers. Sync manually if upstream changes.
 cp "$SCRIPT_DIR/claude/scripts/check-context.sh" "$CLAUDE_DIR/scripts/check-context.sh"
 cp "$SCRIPT_DIR/claude/scripts/context-bar.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
-chmod +x "$CLAUDE_DIR/scripts/check-context.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
-echo "✓ Installed vendored scripts (check-context.sh, context-bar.sh)"
+cp "$SCRIPT_DIR/claude/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-reset.sh"
+cp "$SCRIPT_DIR/claude/scripts/cache-timer-play-sound.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
+chmod +x "$CLAUDE_DIR/scripts/check-context.sh" "$CLAUDE_DIR/scripts/context-bar.sh" \
+         "$CLAUDE_DIR/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
+echo "✓ Installed vendored scripts (check-context.sh, context-bar.sh, cache-timer-reset.sh, cache-timer-play-sound.sh)"
 
 # --- Install shell integration ---
 # Symlink so edits in the repo take effect immediately (no re-install needed)
