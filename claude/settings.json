@@ -22,10 +22,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash __HOME__/.claude/scripts/check-context.sh"
-          },
-          {
-            "type": "command",
             "command": "bash __HOME__/.claude/scripts/cache-timer-reset.sh"
           }
         ]

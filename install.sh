@@ -228,16 +228,18 @@ for skill in "${SKILLS[@]}"; do
 done
 echo "✓ Installed custom skills"
 
-# --- Install vendored scripts (statusline + context check hook) ---
+# --- Install vendored scripts (statusline + cache timer) ---
 # These are vendored from https://github.com/ykdojo/claude-code-tips — see
 # claude/scripts/*.sh headers. Sync manually if upstream changes.
-cp "$SCRIPT_DIR/claude/scripts/check-context.sh" "$CLAUDE_DIR/scripts/check-context.sh"
 cp "$SCRIPT_DIR/claude/scripts/context-bar.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
 cp "$SCRIPT_DIR/claude/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-reset.sh"
 cp "$SCRIPT_DIR/claude/scripts/cache-timer-play-sound.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
-chmod +x "$CLAUDE_DIR/scripts/check-context.sh" "$CLAUDE_DIR/scripts/context-bar.sh" \
+chmod +x "$CLAUDE_DIR/scripts/context-bar.sh" \
          "$CLAUDE_DIR/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
-echo "✓ Installed vendored scripts (check-context.sh, context-bar.sh, cache-timer-reset.sh, cache-timer-play-sound.sh)"
+echo "✓ Installed vendored scripts (context-bar.sh, cache-timer-reset.sh, cache-timer-play-sound.sh)"
+
+# Remove legacy check-context.sh hook (replaced by Claude Code's built-in context warnings)
+rm -f "$CLAUDE_DIR/scripts/check-context.sh"
 
 # --- Install shell integration ---
 # Symlink so edits in the repo take effect immediately (no re-install needed)
