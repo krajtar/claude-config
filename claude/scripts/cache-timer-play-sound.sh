@@ -19,6 +19,10 @@ play_sound() {
     esac
 }
 
+if [[ "$PLATFORM" == "Darwin" ]] && command -v osascript &>/dev/null; then
+    osascript -e 'display notification "Prompt cache expires in ~1 min" with title "Claude Code" subtitle "Cache freshness"' &>/dev/null
+fi
+
 if [[ -n "$CLAUDE_CACHE_SOUND" ]]; then
     play_sound "$CLAUDE_CACHE_SOUND"
 elif [[ "$PLATFORM" == "Darwin" ]]; then

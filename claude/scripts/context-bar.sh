@@ -194,7 +194,7 @@ if [[ -f "$ts_file" ]]; then
         else
             C_TIMER='\033[38;5;167m'  # red
         fi
-        cache_timer_segment=" | ${C_TIMER}🕐 ${expiry_str}${C_RESET}"
+        cache_timer_segment=" | ${C_TIMER}cache - 🕐 ${expiry_str}${C_RESET}"
     fi
 fi
 

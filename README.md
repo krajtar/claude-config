@@ -50,6 +50,17 @@ The installer tracks a hash of the `CLAUDE.md` it installs. On subsequent update
 - If you **haven't edited** `~/.claude/CLAUDE.md` — it gets updated automatically
 - If you **have local edits** — the update is **skipped** with an error message to preserve your changes. You can diff against the new version and re-run the installer after resolving
 
+## Cache freshness alert
+
+The prompt cache invalidates after 5 minutes of inactivity. To avoid silently paying for a cache miss, a `Stop` hook schedules an alert ~4 minutes after each Claude response:
+
+- **macOS**: Submarine sound + native notification banner ("Claude Code — Prompt cache expires in ~1 min")
+- **Linux**: completion sound via `paplay` / `aplay` (falls back to `beep`)
+- Override the sound by exporting `CLAUDE_CACHE_SOUND=/path/to/file` (set to `/dev/null` to silence)
+- The countdown is also shown in the statusline; the timer resets on every new response
+
+On other platforms the alert is a no-op (no errors).
+
 ## Plugins
 
 Installed automatically by `install.sh`. Manual install:
