@@ -60,14 +60,58 @@ echo "Detected shell: $USER_SHELL (rc file: $RC_FILE)"
 echo
 
 # --- Backup existing config ---
-if [ -f "$CLAUDE_DIR/settings.json" ] || [ -f "$CLAUDE_DIR/CLAUDE.md" ]; then
-  BACKUP="$CLAUDE_DIR/backup-$(date +%Y%m%d-%H%M%S)"
-  echo "Backing up existing config to $BACKUP"
-  mkdir -p "$BACKUP"
-  [ -f "$CLAUDE_DIR/settings.json" ] && cp "$CLAUDE_DIR/settings.json" "$BACKUP/"
-  [ -f "$CLAUDE_DIR/CLAUDE.md" ] && cp "$CLAUDE_DIR/CLAUDE.md" "$BACKUP/"
-  [ -f "$CLAUDE_DIR/CLAUDE-managed.md" ] && cp "$CLAUDE_DIR/CLAUDE-managed.md" "$BACKUP/"
-  [ -f "$CLAUDE_DIR/statusline-command.sh" ] && cp "$CLAUDE_DIR/statusline-command.sh" "$BACKUP/"
+# Skip backup when current config is byte-identical to the most recent snapshot
+# (autoupdate fires on every shell start, so most installs are no-ops). Keep
+# only the BACKUP_KEEP most recent snapshots; older ones are pruned.
+BACKUP_FILES=(settings.json CLAUDE.md CLAUDE-managed.md statusline-command.sh)
+BACKUP_KEEP=5
+
+EXISTING_BACKUPS=()
+for d in "$CLAUDE_DIR"/backup-*; do
+  [ -d "$d" ] && EXISTING_BACKUPS+=("$d")
+done
+
+NEED_BACKUP=false
+for f in "${BACKUP_FILES[@]}"; do
+  [ -f "$CLAUDE_DIR/$f" ] && { NEED_BACKUP=true; break; }
+done
+
+if [ "$NEED_BACKUP" = true ]; then
+  SKIP_BACKUP=false
+  if [ "${#EXISTING_BACKUPS[@]}" -gt 0 ]; then
+    LATEST="${EXISTING_BACKUPS[${#EXISTING_BACKUPS[@]}-1]}"
+    SKIP_BACKUP=true
+    for f in "${BACKUP_FILES[@]}"; do
+      current="$CLAUDE_DIR/$f"
+      previous="$LATEST/$f"
+      if [ -f "$current" ] && [ -f "$previous" ]; then
+        cmp -s "$current" "$previous" || { SKIP_BACKUP=false; break; }
+      elif [ -f "$current" ] || [ -f "$previous" ]; then
+        SKIP_BACKUP=false
+        break
+      fi
+    done
+  fi
+
+  if [ "$SKIP_BACKUP" = true ]; then
+    echo "✓ Config unchanged since $(basename "$LATEST") — skipping backup"
+  else
+    BACKUP="$CLAUDE_DIR/backup-$(date +%Y%m%d-%H%M%S)"
+    echo "Backing up existing config to $BACKUP"
+    mkdir -p "$BACKUP"
+    for f in "${BACKUP_FILES[@]}"; do
+      [ -f "$CLAUDE_DIR/$f" ] && cp "$CLAUDE_DIR/$f" "$BACKUP/"
+    done
+    EXISTING_BACKUPS+=("$BACKUP")
+  fi
+
+  if [ "${#EXISTING_BACKUPS[@]}" -gt "$BACKUP_KEEP" ]; then
+    PRUNE_COUNT=$(( ${#EXISTING_BACKUPS[@]} - BACKUP_KEEP ))
+    for ((i=0; i<PRUNE_COUNT; i++)); do
+      rm -rf "${EXISTING_BACKUPS[$i]}"
+    done
+    echo "✓ Pruned $PRUNE_COUNT old backup(s), keeping $BACKUP_KEEP most recent"
+  fi
   echo
 fi
 
