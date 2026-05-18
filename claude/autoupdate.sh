@@ -54,13 +54,12 @@ claude_config_autoupdate() {
     new_commits="$(git log --oneline HEAD..@{u} 2>/dev/null)"
     local commit_count
     # printf avoids the trailing newline that makes `echo "" | wc -l` = 1.
-    commit_count="$(printf '%s' "$new_commits" | wc -l | tr -d " ")"
+    commit_count="$(printf '%s' "$new_commits" | wc -l)"
 
     echo ""
     echo "[claude-config] $commit_count update(s) available — auto-installing:"
     echo "$new_commits" | sed 's/^/  /'
 
-    local old_head="$local_head"
     if git pull --ff-only --quiet 2>/dev/null; then
       echo "[claude-config] Reinstalling config..."
       bash "$config_dir/install.sh" --no-prompt
