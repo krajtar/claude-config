@@ -37,7 +37,13 @@
 - When the user's message is a question without an imperative ("do it", "go for it", "apply"), answer in text only. Wait for an explicit go-ahead before editing
 
 ## Skills
-- Before responding to any non-trivial request, scan the skills list in the system reminder and invoke a matching skill via the Skill tool instead of going straight to raw tools. Symptom/error reports → `diagnose`; "review/check this" → `review`; "how should we approach X" → `plan`; "how does X work / where is Y" → `explore`; small self-contained tasks → `oneshot`; test-first work → `tdd`. When in doubt, prefer the skill — skills encode workflow the user expects
+- Before responding to any non-trivial request, scan the skills list in the system reminder and invoke a matching skill via the Skill tool instead of going straight to raw tools
+- **ALWAYS use the `/diagnose` skill** when the user reports a bug, pastes an error or stack trace, asks "why is X not working", or describes unexpected behavior — **DO NOT SKIP IT**, even when the cause seems obvious. Skipping `/diagnose` and jumping to a fix is the single most common process violation
+- **ALWAYS use the `/commits` skill** when asked to commit — **DO NOT SKIP IT** and **DO NOT** run `git commit` directly. The skill enforces staging review, message format, and branch checks that bare `git commit` bypasses
+- Other triggers: "review/check this" → `review`; "how should we approach X" → `plan`; "how does X work / where is Y" → `explore`; small self-contained tasks → `oneshot`; test-first work → `tdd`. When in doubt, prefer the skill — skills encode workflow the user expects
+
+## Repository Context
+- **ALWAYS read the last 5-10 commit messages** (`git log -10 --oneline` or `git log -5`) when starting work in a repo you haven't touched yet in this session. Recent commits show what's actively being worked on, what was just fixed, and the user's commit style — and they often explain WHY current state exists, preventing you from re-doing or undoing recent work. **DO NOT SKIP THIS** even for "quick" tasks
 
 ## Subagents
 - Use the Haiku model for subagents whose primary job is reading files (e.g., codebase exploration, log scanning). Reserve Sonnet/Opus for subagents that synthesize or write code
