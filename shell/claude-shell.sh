@@ -74,8 +74,8 @@ _claude_shell_alias() {  # name, target
   # If it's already an alias pointing at our target (re-sourcing case), no-op.
   if [[ "$(type -t "$name" 2>/dev/null)" == "alias" ]]; then
     current="$(alias "$name" 2>/dev/null)"
-    # bash prints: alias c='claude'   zsh prints: c=claude
-    if [[ "$current" == "alias $name='$target'" || "$current" == "$name=$target" ]]; then
+    # bash prints: alias c='claude'   zsh prints: c='claude'
+    if [[ "$current" == "alias $name='$target'" || "$current" == "$name='$target'" ]]; then
       return
     fi
   fi
