@@ -120,7 +120,6 @@ SKILLS=(
   k8s-force-cleanup
   k8s-list-ns-resources
   verify
-  commits
   diagnose
   explore
   dispatch
@@ -269,6 +268,14 @@ echo "✓ Installed statusline-command.sh"
 # --- Install skills ---
 for skill in "${SKILLS[@]}"; do
   cp "$SCRIPT_DIR/claude/skills/$skill/SKILL.md" "$CLAUDE_DIR/skills/$skill/SKILL.md"
+done
+# Prune skills removed from the SKILLS array
+for installed in "$CLAUDE_DIR/skills"/*/; do
+  skill_name=$(basename "$installed")
+  if [[ ! " ${SKILLS[*]} " =~ " ${skill_name} " ]]; then
+    rm -rf "$installed"
+    echo "✓ Pruned removed skill: $skill_name"
+  fi
 done
 echo "✓ Installed custom skills"
 
