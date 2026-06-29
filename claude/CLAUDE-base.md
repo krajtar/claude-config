@@ -39,7 +39,6 @@
 ## Skills
 - Before responding to any non-trivial request, scan the skills list in the system reminder and invoke a matching skill via the Skill tool instead of going straight to raw tools
 - **ALWAYS use the `/diagnose` skill** when the user reports a bug, pastes an error or stack trace, asks "why is X not working", or describes unexpected behavior — **DO NOT SKIP IT**, even when the cause seems obvious. Skipping `/diagnose` and jumping to a fix is the single most common process violation
-- **ALWAYS use the `/commits` skill** when asked to commit — **DO NOT SKIP IT** and **DO NOT** run `git commit` directly. The skill enforces staging review, message format, and branch checks that bare `git commit` bypasses
 - Other triggers: "review/check this" → `review`; "how should we approach X" → `plan`; "how does X work / where is Y" → `explore`; small self-contained tasks → `oneshot`; test-first work → `tdd`. When in doubt, prefer the skill — skills encode workflow the user expects
 
 ## Repository Context

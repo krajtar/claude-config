@@ -115,6 +115,13 @@ if [ "$NEED_BACKUP" = true ]; then
   echo
 fi
 
+# --- Agent list (single source of truth for mkdir + cp loops below) ---
+AGENTS=(
+  dev
+  qa
+  reviewer
+)
+
 # --- Skill list (single source of truth for mkdir + cp loops below) ---
 SKILLS=(
   k8s-force-cleanup
@@ -133,6 +140,9 @@ SKILLS=(
 # --- Ensure directories exist ---
 for skill in "${SKILLS[@]}"; do
   mkdir -p "$CLAUDE_DIR/skills/$skill"
+done
+for agent in "${AGENTS[@]}"; do
+  mkdir -p "$CLAUDE_DIR/agents/$agent"
 done
 mkdir -p "$CLAUDE_DIR/scripts"
 
@@ -278,6 +288,21 @@ for installed in "$CLAUDE_DIR/skills"/*/; do
   fi
 done
 echo "✓ Installed custom skills"
+
+# --- Install agents ---
+for agent in "${AGENTS[@]}"; do
+  cp "$SCRIPT_DIR/claude/agents/$agent.md" "$CLAUDE_DIR/agents/$agent.md"
+done
+# Prune agents removed from the AGENTS array
+for installed in "$CLAUDE_DIR/agents"/*.md; do
+  [ -f "$installed" ] || continue
+  agent_name=$(basename "$installed" .md)
+  if [[ ! " ${AGENTS[*]} " =~ " ${agent_name} " ]]; then
+    rm -f "$installed"
+    echo "✓ Pruned removed agent: $agent_name"
+  fi
+done
+echo "✓ Installed agents (dev, qa, reviewer)"
 
 # --- Install vendored scripts (statusline + cache timer) ---
 # These are vendored from https://github.com/ykdojo/claude-code-tips — see
