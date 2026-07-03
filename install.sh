@@ -129,12 +129,12 @@ SKILLS=(
   verify
   diagnose
   explore
-  dispatch
   review
   tdd
   plan
   dev
   oneshot
+  orchestrate
 )
 
 # --- Ensure directories exist ---
@@ -275,9 +275,10 @@ cp "$SCRIPT_DIR/claude/statusline-command.sh" "$CLAUDE_DIR/statusline-command.sh
 chmod +x "$CLAUDE_DIR/statusline-command.sh"
 echo "✓ Installed statusline-command.sh"
 
-# --- Install skills ---
+# --- Install skills (whole directory: SKILL.md plus supporting files like workflows/) ---
 for skill in "${SKILLS[@]}"; do
-  cp "$SCRIPT_DIR/claude/skills/$skill/SKILL.md" "$CLAUDE_DIR/skills/$skill/SKILL.md"
+  rm -rf "$CLAUDE_DIR/skills/$skill"
+  cp -R "$SCRIPT_DIR/claude/skills/$skill" "$CLAUDE_DIR/skills/$skill"
 done
 # Prune skills removed from the SKILLS array
 for installed in "$CLAUDE_DIR/skills"/*/; do
