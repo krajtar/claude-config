@@ -31,8 +31,8 @@ claude() {
     printf "Choice [1]: "
     read -r choice
     case "${choice:-1}" in
-      1) command claude ;;
-      2) command claude --dangerously-skip-permissions ;;
+      1) (unset ANTHROPIC_BASE_URL; command claude) ;;
+      2) (unset ANTHROPIC_BASE_URL; command claude --dangerously-skip-permissions) ;;
       3)
         local proxy_pid=""
         if lsof -iTCP:8787 -sTCP:LISTEN &>/dev/null; then
@@ -62,7 +62,7 @@ claude() {
       *) echo "Invalid choice."; return 1 ;;
     esac
   else
-    command claude "${args[@]}"
+    (unset ANTHROPIC_BASE_URL; command claude "${args[@]}")
   fi
 }
 
