@@ -33,6 +33,10 @@ it reports — you decide.
    - After each phase: run the verification suite yourself, check the diff against the plan,
      update checkboxes. Never take an agent's "done" at face value.
    - Resolve conflicts between agents' changes yourself; don't dispatch an agent to arbitrate.
+   - Log deviations in the plan file's `### Deviations` section, one line each:
+     `Phase N — <what the plan said> → <what was done>, because <what made the plan wrong>`.
+     Require every agent to report deviations as part of its handback — that report is the lead's
+     main signal that the plan is drifting, and it is the record the next phase's agent inherits.
 
 ## Model Policy (strict)
 

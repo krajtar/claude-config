@@ -31,7 +31,14 @@ Execute an implementation plan phase by phase. Verify after each phase before mo
 
    d. **Update checkboxes**: Mark completed steps as `[x]` in the plan file
 
-   e. **Report**: Summarize what was done, what was verified, any issues found
+   e. **Log deviations**: Where the implementation diverged from the plan, append to the plan
+      file's `### Deviations` section (create it if absent), one line each:
+      `Phase N — <what the plan said> → <what was done>, because <what made the plan wrong>`.
+      Log anything that would surprise someone reading only the plan: a different file than
+      specified, an extra step the plan missed, an assumption that turned out false, a step that
+      proved unnecessary. Nothing to log is a valid outcome — say so rather than inventing entries.
+
+   f. **Report**: Summarize what was done, what was verified, any issues found
 
 4. **Stop between phases**: After completing a phase, report status and ask if you should continue to the next phase — unless the user has asked you to run all phases
 
@@ -41,3 +48,6 @@ Execute an implementation plan phase by phase. Verify after each phase before mo
 - **Stop on blockers**: If something in the plan doesn't work as expected, stop and report rather than improvising a workaround
 - **Verify after each phase**: Never skip verification. A phase isn't done until it's verified
 - **Update the plan file**: Check off completed items so progress is tracked
+- **Deviations are data, not failures**: Where reality diverged from the plan is the most useful
+  thing the next reader can know. Log it plainly — don't quietly conform to a plan that turned
+  out to be wrong, and don't hide that you departed from it

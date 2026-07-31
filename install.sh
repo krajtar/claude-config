@@ -131,6 +131,7 @@ SKILLS=(
   explore
   review
   tdd
+  refine
   plan
   dev
   oneshot

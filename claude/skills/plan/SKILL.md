@@ -14,6 +14,13 @@ Design an implementation plan before writing any code. Hard gate: NO code change
    - What are the acceptance criteria?
    - What is explicitly out of scope?
 
+   **Sharpness gate**: if you cannot answer those three from what the user gave you plus a quick
+   look at the codebase, the problem isn't ready to plan against. Say which parts are unclear and
+   offer `/refine` — it interviews the user and produces a sharpened problem statement to plan
+   from. Then stop; don't plan around the gap. If the user hands you a `PROBLEM.md` (or says to
+   proceed anyway), take its decisions and constraints as settled and move to step 2 without
+   reopening them.
+
 2. **Explore the codebase** in parallel to understand:
    - Where similar features exist (patterns to follow)
    - What code will need to change
@@ -40,6 +47,9 @@ Design an implementation plan before writing any code. Hard gate: NO code change
 
    ### Verification
    - [ ] How to verify the feature works end-to-end
+
+   ### Deviations
+   <!-- filled in during implementation, not now -->
    ```
 
    Each step should include:
