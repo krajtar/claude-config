@@ -14,7 +14,7 @@ Personal Claude Code configuration, skills, aliases, and scripts — portable ac
 | `claude/statusline-command.sh` | Context/model display bar for statusline |
 | `claude/skills/` | Custom skills (k8s-force-cleanup, k8s-list-ns-resources) |
 | `claude/scripts/` | Vendored helper scripts (statusline, Stop hook) from [claude-code-tips](https://github.com/ykdojo/claude-code-tips) |
-| `shell/claude-shell.sh` | Shell aliases and functions (c, ch, cs, sc, scg, dashboard) |
+| `shell/claude-shell.sh` | Shell aliases and functions (c, ch, cs) |
 | `install.sh` | Installer — copies config, installs plugins |
 
 ## Quick start
@@ -74,18 +74,16 @@ claude plugin install dx@ykdojo
 
 | Alias/Function | Description |
 |----------------|-------------|
-| `c` | `claude` |
-| `ch` | `claude --chrome` |
-| `cs` | `claude --dangerously-skip-permissions` |
-| `claude` (no args) | Interactive menu: local / Headroom proxy / SafeClaw container / SafeClaw + repo clone |
-| `sc [name]` | Start SafeClaw container |
-| `scg [name]` | Start SafeClaw container + clone current repo |
-| `dashboard` | Start SafeClaw dashboard on port 7690 |
+| `c` | Interactive menu: local / skip permissions / Headroom proxy / Headroom + skip permissions |
+| `ch` | `claude --chrome --remote-control` |
+| `cs` | `claude --dangerously-skip-permissions --remote-control` |
+
+`claude` itself is never shadowed — it always runs the real binary untouched.
 
 ## Dependencies
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`npm install -g @anthropic-ai/claude-code`)
-- [Headroom](https://github.com/chopratejas/headroom) (optional — context compression proxy, used by the `claude` interactive menu)
+- [Headroom](https://github.com/chopratejas/headroom) (optional — context compression proxy, used by the `c` interactive menu)
 - `jq`, `python3` (for statusline script)
 
 The statusline/hook scripts under `claude/scripts/` are vendored from [claude-code-tips](https://github.com/ykdojo/claude-code-tips). The `dx@ykdojo` plugin still resolves via Claude Code's marketplace system (no local clone needed).

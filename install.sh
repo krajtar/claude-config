@@ -330,7 +330,7 @@ add_source_line() {
   if [ -f "$rc_file" ]; then
     if ! grep -qF 'claude-shell.sh' "$rc_file" 2>/dev/null; then
       echo '' >> "$rc_file"
-      echo '# Claude Code + SafeClaw' >> "$rc_file"
+      echo '# Claude Code shell integration' >> "$rc_file"
       echo '[ -f ~/.claude-shell.sh ] && . ~/.claude-shell.sh' >> "$rc_file"
       echo "✓ Added source line to $rc_file"
     else
@@ -338,7 +338,7 @@ add_source_line() {
     fi
   else
     # Create the rc file if it doesn't exist
-    echo '# Claude Code + SafeClaw' > "$rc_file"
+    echo '# Claude Code shell integration' > "$rc_file"
     echo '[ -f ~/.claude-shell.sh ] && . ~/.claude-shell.sh' >> "$rc_file"
     echo "✓ Created $rc_file with source line"
   fi
