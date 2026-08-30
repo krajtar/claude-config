@@ -31,8 +31,8 @@ claude() {
     printf "Choice [1]: "
     read -r choice
     case "${choice:-1}" in
-      1) (unset ANTHROPIC_BASE_URL; command claude) ;;
-      2) (unset ANTHROPIC_BASE_URL; command claude --dangerously-skip-permissions) ;;
+      1) (unset ANTHROPIC_BASE_URL; command claude --remote-control) ;;
+      2) (unset ANTHROPIC_BASE_URL; command claude --dangerously-skip-permissions --remote-control) ;;
       3)
         local proxy_pid=""
         if lsof -iTCP:8787 -sTCP:LISTEN &>/dev/null; then
@@ -42,7 +42,7 @@ claude() {
           proxy_pid=$!
           sleep 1
         fi
-        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude
+        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude --remote-control
         [[ -n "$proxy_pid" ]] && kill "$proxy_pid" 2>/dev/null
         ;;
       4)
@@ -54,7 +54,7 @@ claude() {
           proxy_pid=$!
           sleep 1
         fi
-        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude --dangerously-skip-permissions
+        ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude --dangerously-skip-permissions --remote-control
         [[ -n "$proxy_pid" ]] && kill "$proxy_pid" 2>/dev/null
         ;;
       5) $has_safeclaw && sc || { echo "SafeClaw not installed."; return 1; } ;;
@@ -62,7 +62,7 @@ claude() {
       *) echo "Invalid choice."; return 1 ;;
     esac
   else
-    (unset ANTHROPIC_BASE_URL; command claude "${args[@]}")
+    (unset ANTHROPIC_BASE_URL; command claude --remote-control "${args[@]}")
   fi
 }
 
@@ -86,9 +86,9 @@ _claude_shell_alias() {  # name, target
   fi
   alias "$name=$target"
 }
-_claude_shell_alias c  'claude --remote-control'
-_claude_shell_alias ch 'claude --chrome --remote-control'
-_claude_shell_alias cs 'claude --dangerously-skip-permissions --remote-control'
+_claude_shell_alias c  'claude'
+_claude_shell_alias ch 'claude --chrome'
+_claude_shell_alias cs 'claude --dangerously-skip-permissions'
 unset -f _claude_shell_alias
 
 # Start the dashboard on port 7690
