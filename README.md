@@ -52,9 +52,9 @@ The installer tracks a hash of the `CLAUDE.md` it installs. On subsequent update
 
 ## Cache freshness alert
 
-The prompt cache invalidates after 1 hour of inactivity. To avoid silently paying for a cache miss, a `Stop` hook schedules an alert ~59 minutes after each Claude response:
+The prompt cache invalidates after 1 hour of inactivity. To avoid silently paying for a cache miss, a `Stop` hook schedules an alert ~55 minutes after each Claude response:
 
-- **macOS**: Submarine sound + native notification banner ("Claude Code — Prompt cache expires in ~1 min")
+- **macOS**: Submarine sound + native notification banner ("Claude Code — Prompt cache expires in ~5 min")
 - **Linux**: completion sound via `paplay` / `aplay` (falls back to `beep`)
 - Override the sound by exporting `CLAUDE_CACHE_SOUND=/path/to/file` (set to `/dev/null` to silence)
 - The countdown is also shown in the statusline; the timer resets on every new response
