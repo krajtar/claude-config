@@ -11,6 +11,7 @@ All notable changes to this project are documented here.
 ### Changed
 - Renamed the interactive shell wrapper from `claude()` to `c()` so it never shadows the real `claude` binary — plain `claude` invocations (scripts, muscle memory, other tools) now always run the actual command untouched
 - `ch`/`cs` are now plain aliases straight to the real `claude` binary instead of routing through the wrapper function
+- Statusline cache freshness timer changed from 5 minutes to 1 hour (alert now fires ~59 min after a response instead of ~4 min)
 
 ### Removed
 - SafeClaw container integration entirely: `sc`, `scg`, `dashboard` functions, the `SAFECLAW_DIR` variable, and the container-related menu options in `c`

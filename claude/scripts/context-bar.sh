@@ -185,11 +185,11 @@ if [[ -f "$ts_file" ]]; then
         now=$(date +%s)
         elapsed=$((now - ts))
         [[ $elapsed -lt 0 ]] && elapsed=0
-        expiry_ts=$((ts + 300))
+        expiry_ts=$((ts + 3600))
         expiry_str=$(date -r "$expiry_ts" +%H:%M 2>/dev/null || date -d "@$expiry_ts" +%H:%M 2>/dev/null)
-        if [[ $elapsed -lt 240 ]]; then
+        if [[ $elapsed -lt 3540 ]]; then
             C_TIMER='\033[38;5;71m'   # green
-        elif [[ $elapsed -lt 300 ]]; then
+        elif [[ $elapsed -lt 3600 ]]; then
             C_TIMER='\033[38;5;136m'  # gold
         else
             C_TIMER='\033[38;5;167m'  # red
