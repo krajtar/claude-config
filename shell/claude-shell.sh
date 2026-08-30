@@ -86,9 +86,9 @@ _claude_shell_alias() {  # name, target
   fi
   alias "$name=$target"
 }
-_claude_shell_alias c  'claude'
-_claude_shell_alias ch 'claude --chrome'
-_claude_shell_alias cs 'claude --dangerously-skip-permissions'
+_claude_shell_alias c  'claude --remote-control'
+_claude_shell_alias ch 'claude --chrome --remote-control'
+_claude_shell_alias cs 'claude --dangerously-skip-permissions --remote-control'
 unset -f _claude_shell_alias
 
 # Start the dashboard on port 7690

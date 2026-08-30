@@ -13,6 +13,7 @@
 - Do not stage meta/session-tracking files (`HANDOFF.md`, `CLAUDE.md`, `todo.md`, `.playwright-mcp/`) unless the user explicitly names them
 - When resolving rebase/merge conflicts or stash pops, state which side was chosen using explicit "ours"/"theirs" terminology alongside any informal description (e.g., "took ours (feature branch) over theirs (main) — the feature branch has the updated config")
 - When the user references a PR or URL and says "create" or "apply", confirm the exact mechanism (merge vs. `kubectl apply` vs. cherry-pick) before acting — never merge the PR on that phrasing
+- At the end of any work that produced artifacts (code, config, docs), always commit before finishing — don't leave changes uncommitted for the user to clean up. This is a commit, not a push: the push-to-main and merge confirmation rules above still apply unchanged
 
 ## Security
 - Never print raw credentials, API tokens, or secrets in responses — even when the user asks for an "export command." Provide the command with a placeholder and instruct the user to substitute the value. This includes tokens embedded in kubeconfig files, service account secrets, and any file the user provides — extract only non-sensitive fields (server URL, CA cert) and write secrets directly to files without echoing values in responses
