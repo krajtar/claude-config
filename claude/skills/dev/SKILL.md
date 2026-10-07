@@ -23,7 +23,8 @@ Execute an implementation plan phase by phase. Verify after each phase before mo
    b. **Implement**: Execute the steps in the plan
       - Follow the plan's approach — don't improvise unless you hit a blocker
       - If a step is unclear, stop and ask rather than guessing
-      - Use subagents for independent steps within the phase
+      - Use subagents for independent steps within the phase — dev agents on haiku by default,
+        escalating per the Model Policy in the `orchestrate` skill
 
    c. **Verify** (two checks):
       - **Spec check**: Does the implementation match what the plan specified?

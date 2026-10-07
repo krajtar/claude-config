@@ -17,7 +17,8 @@ frontend + backend halves behind an agreed interface, or multiple unrelated call
    shapes into the codebase (or the plan file) so every stream builds against the same
    frozen surface.
 
-2. **Dispatch one dev agent (sonnet) per stream, in parallel.** Each prompt states:
+2. **Dispatch one dev agent per stream, in parallel** — haiku by default, picking the tier per
+   stream with the Model Policy. Each prompt states:
    the stream's scope, the frozen contract verbatim, the explicit list of files the
    *other* streams own (do not touch), and the report format.
 
@@ -33,9 +34,9 @@ frontend + backend halves behind an agreed interface, or multiple unrelated call
 
 ## Sizing cautions
 
-- Parallelism multiplies context spend — 3 streams = 3 × 200k budgets burning at once.
+- Parallelism multiplies context spend — 3 streams = 3 agent budgets burning at once.
   Cap at 3–4 concurrent agents; queue the rest.
-- A stream too big for one 200k agent doesn't become parallelizable by splitting it
+- A stream too big for one agent doesn't become parallelizable by splitting it
   mid-stream — split it into sequential phases within the stream instead.
 - If the independence test is borderline, it failed. Sequential is slower but never
   produces a broken merge.

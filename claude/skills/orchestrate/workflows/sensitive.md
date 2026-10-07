@@ -7,6 +7,10 @@ Differences from the standard feature workflow — everything else is the same:
 
 ## Tighter gates
 
+0. **Sonnet minimum for dev agents.** Haiku-first does not apply to sensitive phases —
+   dev agents start on sonnet. Haiku is still fine for read-only recon and for qa agents
+   writing tests against an already-reviewed phase.
+
 1. **Mandatory user approval of the plan** before any implementation, every time — even
    if the approach seems obvious. The plan must name the blast radius: what breaks if
    this is wrong, and how it gets rolled back.

@@ -21,7 +21,7 @@ Design an implementation plan before writing any code. Hard gate: NO code change
    proceed anyway), take its decisions and constraints as settled and move to step 2 without
    reopening them.
 
-2. **Explore the codebase** in parallel to understand:
+2. **Explore the codebase** in parallel (Explore agents, `model: haiku`) to understand:
    - Where similar features exist (patterns to follow)
    - What code will need to change
    - What dependencies and constraints exist

@@ -14,7 +14,7 @@ Deep codebase exploration. Read-only — never modify any files.
    - What specifically is being asked (how does X work? where is Y defined? what calls Z?)
    - Which areas of the codebase are likely relevant
 
-2. **Dispatch parallel exploration agents** across relevant domains:
+2. **Dispatch parallel Explore agents** (`model: haiku`) across relevant domains:
 
    Choose 2-4 agents from these categories based on the question:
    - **Backend**: API routes, services, business logic, database queries

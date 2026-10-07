@@ -14,7 +14,7 @@ it reports — you decide.
 
 1. **Understand and plan (lead does this personally)**
    - Read the spec/description from `$ARGUMENTS`. Explore the codebase enough to own the
-     design — delegate broad read-only sweeps to Explore agents (haiku), but read the
+     design — delegate broad read-only sweeps to Explore agents (Haiku), but read the
      load-bearing files yourself. Never delegate the architectural decision.
    - Write a plan file with phases and checkboxes (like `/plan` output). Get user approval
      before any implementation if the work is sensitive or the approach has open questions.
@@ -38,25 +38,41 @@ it reports — you decide.
      Require every agent to report deviations as part of its handback — that report is the lead's
      main signal that the plan is drifting, and it is the record the next phase's agent inherits.
 
-## Model Policy (strict)
+## Model Policy (strict) — Haiku first, escalate on evidence
+
+All tiers are the Claude 5.5 family (`haiku` / `sonnet` / `opus` aliases). Always pass `model`
+explicitly on every Agent call — an omitted model inherits the lead's (Opus) model.
 
 - **Never spawn a subagent with Fable.** No exceptions.
-- **haiku** — reading-dominated work: exploration, log scanning, locating code, summarizing files.
-- **sonnet** (default) — dev, qa, reviewer work. When in doubt, sonnet.
-- **opus** — only when a single task is genuinely very high complexity: intricate concurrency,
-  a gnarly algorithm, synthesis across many subsystems. Prefer splitting the task and using
-  sonnet first; reach for opus only when splitting doesn't reduce the difficulty.
+- **haiku (default for coding)** — exploration, log scanning, and most dev and qa tasks: a
+  well-specified phase with named files, an existing pattern to follow, and a runnable check.
+  Haiku 5.5 costs ~1/20th of Sonnet, so it is the starting tier, not a fallback.
+- **sonnet** — escalate to it when any one holds:
+  - the task needs judgment the prompt can't pin down: no existing pattern to copy, or
+    design choices left inside the phase;
+  - the change crosses module boundaries or touches more than ~8 files;
+  - non-trivial algorithmic, concurrency, or state-management logic;
+  - security-, auth-, migration-, or data-integrity-adjacent code (see `workflows/sensitive.md`);
+  - a Haiku agent failed lead verification twice on the same task.
+  Reviewer agents stay on sonnet: they are the quality gate for Haiku-written code.
+- **opus** — only when a single task stays very high complexity after attempting to split it,
+  or a Sonnet agent failed verification twice on it.
 
-## Task Sizing — subagents have 200k contexts, not 1M
+**Escalation ladder.** On a failed verification, first retry at the same tier with a tightened
+prompt (the exact failure output, the file:line, the decision it got wrong). If that fails too,
+escalate one tier and record it in `### Deviations`. Never skip a tier on the first attempt
+unless a sonnet/opus criterion above already applies.
 
-Every token an agent spends reading files, running commands, and iterating comes out of a
-200k budget. An overloaded agent degrades silently: it forgets early constraints and produces
-sloppy work at the end of its context. Size tasks so an agent finishes well inside budget:
+## Task Sizing — budget for ~200k of useful context
+
+The 5.5 models have 1M-token windows, but agent quality degrades long before the limit, and a
+subagent may not be granted the full window. Size every task to finish comfortably inside ~200k:
 
 - **One phase or one module per agent.** If describing the task needs the word "and" between
   unrelated deliverables, split it.
 - **Rough ceiling per agent: ~10–15 files to read/modify, one coherent unit of change.**
-  Bigger than that → split by module or into sequential phases.
+  Bigger than that → split by module or into sequential phases. Smaller, sharper tasks also
+  keep work on the Haiku tier.
 - **Fresh agent per phase.** Don't continue a long-running agent into new work via
   SendMessage — its context is already spent. Continuation is only for small follow-ups
   ("also fix the lint error you introduced").

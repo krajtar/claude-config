@@ -17,7 +17,7 @@ Review code changes and report issues. Read-only by default — do NOT fix anyth
 
 2. **Read the full diff** and identify changed files
 
-3. **Dispatch review agents** in parallel across the changed files:
+3. **Dispatch reviewer agents** (`model: sonnet`) in parallel across the changed files:
    - Each agent reads the changed files in full (not just the diff) for context
    - Each agent focuses on its assigned files
 
