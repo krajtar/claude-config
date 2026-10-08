@@ -13,7 +13,8 @@ Personal Claude Code configuration, skills, aliases, and scripts — portable ac
 | `claude/settings.json` | Settings (model, env vars, hooks, plugins, statusline) |
 | `claude/statusline-command.sh` | Context/model display bar for statusline |
 | `claude/skills/` | Custom skills (k8s-force-cleanup, k8s-list-ns-resources) |
-| `claude/scripts/` | Vendored helper scripts (statusline, Stop hook) from [claude-code-tips](https://github.com/ykdojo/claude-code-tips) |
+| `claude/scripts/` | Statusline script, originally from [claude-code-tips](https://github.com/ykdojo/claude-code-tips) |
+| `claude/plugins/cache-timer/` | Plugin that warns before the prompt cache expires (this repo is its marketplace) |
 | `shell/claude-shell.sh` | Shell aliases and functions (c, ch, cs) |
 | `install.sh` | Installer — copies config, installs plugins |
 
@@ -52,22 +53,25 @@ The installer tracks a hash of the `CLAUDE.md` it installs. On subsequent update
 
 ## Cache freshness alert
 
-The prompt cache invalidates after 1 hour of inactivity. To avoid silently paying for a cache miss, a `Stop` hook schedules an alert ~55 minutes after each Claude response:
+The prompt cache invalidates after 1 hour of inactivity. To avoid silently paying for a cache miss, the `cache-timer` plugin (`claude/plugins/cache-timer/`) alerts ~55 minutes after the last main-conversation turn in each session:
 
-- **macOS**: Submarine sound + native notification banner ("Claude Code — Prompt cache expires in ~5 min")
+- **Everywhere**: an in-app toast ("Prompt cache expires in ~5 min")
+- **macOS**: Submarine sound + native notification banner
 - **Linux**: completion sound via `paplay` / `aplay` (falls back to `beep`)
 - Override the sound by exporting `CLAUDE_CACHE_SOUND=/path/to/file` (set to `/dev/null` to silence)
-- The countdown is also shown in the statusline; the timer resets on every new response
+- Each session has its own timer; it resets on every turn, and subagent turns don't count
+- The statusline shows the expiry time, read from `~/.claude/cache-timer/<session_id>.ts`, which the plugin writes
 
-On other platforms the alert is a no-op (no errors).
+This repo is a local plugin marketplace (`.claude-plugin/marketplace.json`), so the plugin is read straight from the clone: after editing it, run `/reload-plugins`. Tests: `claude plugin test claude/plugins/cache-timer`.
 
 ## Plugins
 
-Installed automatically by `install.sh`. Manual install:
+Installed automatically by `install.sh` (`playwright`, `dx`, `cache-timer`). Manual install:
 
 ```
 claude plugin install playwright@claude-plugins-official
 claude plugin install dx@ykdojo
+claude plugin marketplace add <path-to-this-repo> && claude plugin install cache-timer@claude-config
 ```
 
 ## Shell aliases
@@ -86,4 +90,4 @@ claude plugin install dx@ykdojo
 - [Headroom](https://github.com/chopratejas/headroom) (optional — context compression proxy, used by the `c` interactive menu)
 - `jq`, `python3` (for statusline script)
 
-The statusline/hook scripts under `claude/scripts/` are vendored from [claude-code-tips](https://github.com/ykdojo/claude-code-tips). The `dx@ykdojo` plugin still resolves via Claude Code's marketplace system (no local clone needed).
+The statusline script under `claude/scripts/` was originally vendored from [claude-code-tips](https://github.com/ykdojo/claude-code-tips). The `dx@ykdojo` plugin still resolves via Claude Code's marketplace system (no local clone needed).

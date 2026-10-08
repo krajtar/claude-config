@@ -1,0 +1,13 @@
+{
+  "name": "claude-config",
+  "owner": {
+    "name": "Kamil Rajtar"
+  },
+  "description": "Plugins from the claude-config repo",
+  "plugins": [
+    {
+      "name": "cache-timer",
+      "source": "./claude/plugins/cache-timer"
+    }
+  ]
+}

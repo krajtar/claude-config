@@ -306,15 +306,17 @@ for installed in "$CLAUDE_DIR/agents"/*.md; do
 done
 echo "✓ Installed agents (dev, qa, reviewer)"
 
-# --- Install vendored scripts (statusline + cache timer) ---
-# These are vendored from https://github.com/ykdojo/claude-code-tips — see
-# claude/scripts/*.sh headers. Sync manually if upstream changes.
+# --- Install context-bar statusline ---
 cp "$SCRIPT_DIR/claude/scripts/context-bar.sh" "$CLAUDE_DIR/scripts/context-bar.sh"
-cp "$SCRIPT_DIR/claude/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-reset.sh"
-cp "$SCRIPT_DIR/claude/scripts/cache-timer-play-sound.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
-chmod +x "$CLAUDE_DIR/scripts/context-bar.sh" \
-         "$CLAUDE_DIR/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh"
-echo "✓ Installed vendored scripts (context-bar.sh, cache-timer-reset.sh, cache-timer-play-sound.sh)"
+chmod +x "$CLAUDE_DIR/scripts/context-bar.sh"
+echo "✓ Installed context-bar.sh"
+
+# Remove the legacy shell cache timer (replaced by the cache-timer plugin)
+if [ -f /tmp/claude-cache-timer.pid ]; then
+  kill "$(cat /tmp/claude-cache-timer.pid 2>/dev/null)" 2>/dev/null || true
+fi
+rm -f "$CLAUDE_DIR/scripts/cache-timer-reset.sh" "$CLAUDE_DIR/scripts/cache-timer-play-sound.sh" \
+      /tmp/claude-cache-timer.pid /tmp/claude-cache-timer.ts
 
 # Remove legacy check-context.sh hook (replaced by Claude Code's built-in context warnings)
 rm -f "$CLAUDE_DIR/scripts/check-context.sh"
@@ -473,10 +475,14 @@ if command -v claude &>/dev/null; then
   }
   _install_plugin playwright@claude-plugins-official "playwright plugin"
   _install_plugin dx@ykdojo "dx plugin"
+  # This repo is a local marketplace; plugins are read straight from the clone
+  claude plugin marketplace add "$SCRIPT_DIR" >/dev/null 2>&1 || true
+  _install_plugin cache-timer@claude-config "cache-timer plugin"
 else
   echo "⊘ claude CLI not found — install plugins manually after installing Claude Code:"
   echo "  claude plugin install playwright@claude-plugins-official"
   echo "  claude plugin install dx@ykdojo"
+  echo "  claude plugin marketplace add $SCRIPT_DIR && claude plugin install cache-timer@claude-config"
 fi
 
 echo

@@ -29,6 +29,7 @@ input=$(cat)
 # Extract model, directory, and cwd
 model=$(echo "$input" | jq -r '.model.display_name // .model.id // "?"')
 cwd=$(echo "$input" | jq -r '.cwd // empty')
+session_id=$(echo "$input" | jq -r '.session_id // empty')
 dir=$(basename "$cwd" 2>/dev/null || echo "?")
 
 # Get git branch, uncommitted file count, and sync status
@@ -176,10 +177,10 @@ else
     ctx="${bar} ${C_GRAY}~${pct}% of ${max_display} tokens"
 fi
 
-# Cache freshness timer — shows expiry clock HH:MM
+# Cache freshness timer — shows expiry clock HH:MM (stamp written by the cache-timer plugin)
 cache_timer_segment=""
-ts_file="/tmp/claude-cache-timer.ts"
-if [[ -f "$ts_file" ]]; then
+ts_file="$HOME/.claude/cache-timer/${session_id}.ts"
+if [[ -n "$session_id" && -f "$ts_file" ]]; then
     ts=$(cat "$ts_file" 2>/dev/null)
     if [[ -n "$ts" && "$ts" =~ ^[0-9]+$ ]]; then
         now=$(date +%s)

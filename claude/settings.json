@@ -16,18 +16,6 @@
     ]
   },
   "model": "opus",
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash __HOME__/.claude/scripts/cache-timer-reset.sh"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "bash __HOME__/.claude/scripts/context-bar.sh"
@@ -35,7 +23,8 @@
   "enabledPlugins": {
     "dx@ykdojo": true,
     "playwright@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "cache-timer@claude-config": true
   },
   "extraKnownMarketplaces": {
     "ykdojo": {

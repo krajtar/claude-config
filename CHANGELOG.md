@@ -9,9 +9,12 @@ All notable changes to this project are documented here.
 - `CLAUDE-base.md` rule: always commit at the end of any work that produced artifacts (code, config, docs), without pushing/merging past what's already confirmed
 
 ### Changed
+- Cache freshness alert moved from the shell `Stop` hook to the `cache-timer` plugin (this repo is now its local marketplace): one timer per session instead of one shared `/tmp` timer, subagent turns ignored, in-app toast added, and no detached `sleep` process
+- Statusline reads the cache expiry per session from `~/.claude/cache-timer/<session_id>.ts`
 - Renamed the interactive shell wrapper from `claude()` to `c()` so it never shadows the real `claude` binary — plain `claude` invocations (scripts, muscle memory, other tools) now always run the actual command untouched
 - `ch`/`cs` are now plain aliases straight to the real `claude` binary instead of routing through the wrapper function
 - Statusline cache freshness timer changed from 5 minutes to 1 hour, with the alert firing 5 min before expiry (~55 min after a response) instead of 1 min before
 
 ### Removed
+- `cache-timer-reset.sh` / `cache-timer-play-sound.sh` and the `Stop` hook; the installer deletes the installed copies and stops a pending legacy timer
 - SafeClaw container integration entirely: `sc`, `scg`, `dashboard` functions, the `SAFECLAW_DIR` variable, and the container-related menu options in `c`

@@ -1,0 +1,8 @@
+{
+  "name": "cache-timer",
+  "version": "0.1.0",
+  "description": "Warns 5 minutes before the 1-hour prompt cache expires, per session, and records the last turn time for the status line.",
+  "author": {
+    "name": "Kamil Rajtar"
+  }
+}
