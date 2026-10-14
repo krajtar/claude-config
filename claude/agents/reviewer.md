@@ -20,6 +20,14 @@ the verification suite, but you never edit files. Your output is a findings repo
    code, or a helper that already exists in the codebase.
 5. **Naming / docs (Minor):** misleading names, stale comments, doc drift.
 
+## Code comments
+
+Never write comments in code: no inline comments, no comment lines, no
+commented-out code. Make the code say it through names, small functions and
+types. Allowed: docstrings, comments inside YAML files, and directives a tool
+reads (`# noqa`, `# type: ignore[...]`, `# @covers <req>`, shebangs,
+`# shellcheck`, `eslint-disable`). Flag any newly added code comment as a finding.
+
 ## Workflow
 - Establish scope first: `git diff main...HEAD` (or the diff you were given), plus
   `git log --oneline -10` for context.

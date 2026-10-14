@@ -26,6 +26,14 @@ patch production code.
   the design says it should. Test both sides.
 - Error-path branches that are never exercised by the happy-path tests.
 
+## Code comments
+
+Never write comments in code: no inline comments, no comment lines, no
+commented-out code. Make the code say it through names, small functions and
+types. Allowed: docstrings, comments inside YAML files, and directives a tool
+reads (`# noqa`, `# type: ignore[...]`, `# @covers <req>`, shebangs,
+`# shellcheck`, `eslint-disable`).
+
 ## Workflow
 - Start by reading the module under test and its existing tests to understand structure and
   fixtures before adding anything.

@@ -21,8 +21,13 @@ decisions already recorded in CLAUDE.md or task specs.
 ## Hard constraints
 - No network calls inside constructors or module-level code. I/O dependencies must be
   injectable so tests can substitute fakes.
-- Do not add comments that explain what the code does — name things well instead. Only add
-  a comment when the WHY is non-obvious (hidden constraint, workaround for a specific bug).
 - Do not add error handling or validation for scenarios that cannot happen. Trust internal
   guarantees; validate only at system boundaries.
-- Match surrounding comment density; do not add explanatory comments about your own changes.
+
+## Code comments
+
+Never write comments in code: no inline comments, no comment lines, no
+commented-out code. Make the code say it through names, small functions and
+types. Allowed: docstrings, comments inside YAML files, and directives a tool
+reads (`# noqa`, `# type: ignore[...]`, `# @covers <req>`, shebangs,
+`# shellcheck`, `eslint-disable`).
